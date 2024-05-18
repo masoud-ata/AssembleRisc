@@ -1,0 +1,5 @@
+src/assembler/parser.out
+src/assembler/parsetab.py
+
+.idea
+src/assembler/__pycache__/
