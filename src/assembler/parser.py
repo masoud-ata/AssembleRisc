@@ -36,7 +36,7 @@ def p_statement_i_instruction(p):
     }
 
 
-def p_statement_i_load_instruction(p):
+def p_statement_iload_s_instruction(p):
     """expression : ID register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
     if p[1] in I_LOAD_INSTRUCTIONS:
         p[0] = {
@@ -65,6 +65,17 @@ def p_statement_u_instruction(p):
         'opcode': p[1],
         'rd': p[2].replace("x", ""),
         'imm': int(p[4]),
+        'lineno': p.lineno(1)
+    }
+
+
+def p_expression_jal_instruction(p):
+    """expression : ID register COMMA ID NEWLINE"""
+    p[0] = {
+        'type': 'jal_instruction',
+        'opcode': p[1],
+        'rd': p[2].replace("x", ""),
+        'label': p[4],
         'lineno': p.lineno(1)
     }
 

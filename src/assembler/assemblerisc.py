@@ -36,6 +36,11 @@ def get_immediate_binary_20(value) -> str:
     return '{0:020b}'.format(int(value))
 
 
+def get_immediate_binary_20_jal(value) -> str:
+    imm_bits = get_immediate_binary_20(value)
+    return imm_bits[0] + imm_bits[10:20] + imm_bits[9] + imm_bits[1:9]
+
+
 def decode_r_instruction(instruction_fields) -> str:
     opcode_bits = R_OPCODE
     rd_bits = get_register_index_binary(instruction_fields['rd'])
@@ -81,13 +86,22 @@ def decode_u_instruction(instruction_fields) -> str:
     return imm_bits + rd_bits + opcode_bits
 
 
-def decode_b_instruction(instruction_fields, labels, address) -> str:
+def decode_jal_instruction(instruction_fields, labels, instruction_address) -> str:
+    opcode_bits = JAL_OPCODE
+    rd_bits = get_register_index_binary(instruction_fields['rd'])
+    target_address = labels[instruction_fields['label']]
+    imm_value = (target_address - instruction_address) // 2
+    imm_bits = get_immediate_binary_20_jal(imm_value)
+    return imm_bits + rd_bits + opcode_bits
+
+
+def decode_b_instruction(instruction_fields, labels, instruction_address) -> str:
     opcode_bits = B_OPCODE
     rs1_bits = get_register_index_binary(instruction_fields['rs1'])
     rs2_bits = get_register_index_binary(instruction_fields['rs2'])
     funct3_bits = B_FUNCT3[instruction_fields['opcode']]
     target_address = labels[instruction_fields['label']]
-    imm_value = (target_address - address) // 2
+    imm_value = (target_address - instruction_address) // 2
     imm_bits_12_10to5, imm_bits_4to1_11 = get_immediate_binary_12b(imm_value)
     return imm_bits_12_10to5 + rs2_bits + rs1_bits + funct3_bits + imm_bits_4to1_11 + opcode_bits
 
@@ -109,7 +123,7 @@ def convert_to_hex(binary_code) -> str:
     return hex_result
 
 
-def assemble(filename):
+def assemble(filename) -> (str, str):
     try:
         with open(filename) as file:
             instruction_address = 0
@@ -128,28 +142,28 @@ def assemble(filename):
             for line in file:
                 result = paerser.parse(line)
                 # print(result)
+
                 if result['type'] == 'r_instruction':
                     binary_code += decode_r_instruction(result) + "\n"
-                    instruction_address += 4
                 elif result['type'] == 'i_instruction':
                     if result['opcode'] in I_SHIFT_INSTRUCTION:
                         binary_code += decode_i_shift_instruction(result) + "\n"
-                        instruction_address += 4
                     else:
                         binary_code += decode_i_instruction(result) + "\n"
-                        instruction_address += 4
                 elif result['type'] == 'i_load_instruction':
                     binary_code += decode_i_load_instruction(result) + "\n"
-                    instruction_address += 4
                 elif result['type'] == 'u_instruction':
                     binary_code += decode_u_instruction(result) + "\n"
-                    instruction_address += 4
+                elif result['type'] == 'jal_instruction':
+                    binary_code += decode_jal_instruction(result, labels, instruction_address) + "\n"
                 elif result['type'] == 'b_instruction':
                     binary_code += decode_b_instruction(result, labels, instruction_address) + "\n"
-                    instruction_address += 4
                 elif result['type'] == 's_instruction':
                     binary_code += decode_s_instruction(result) + "\n"
+
+                if 'instruction' in result['type']:
                     instruction_address += 4
+
             return binary_code, convert_to_hex(binary_code)
     except IOError:
         print("No such file!")
