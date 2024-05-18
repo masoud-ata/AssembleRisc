@@ -36,9 +36,18 @@ def p_statement_i_instruction(p):
     }
 
 
-def p_statement_iload_s_instruction(p):
+def p_statement_iload_s_jalr_instruction(p):
     """expression : ID register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
-    if p[1] in I_LOAD_INSTRUCTIONS:
+    if p[1] == INSTRUCTION_JALR:
+        p[0] = {
+            'type': 'jalr_instruction',
+            'opcode': p[1],
+            'rd': p[2].replace("x", ""),
+            'rs1': p[6].replace("x", ""),
+            'imm': int(p[4]),
+            'lineno': p.lineno(1)
+        }
+    elif p[1] in I_LOAD_INSTRUCTIONS:
         p[0] = {
             'type': 'i_load_instruction',
             'opcode': p[1],

@@ -95,6 +95,15 @@ def decode_jal_instruction(instruction_fields, labels, instruction_address) -> s
     return imm_bits + rd_bits + opcode_bits
 
 
+def decode_jalr_instruction(instruction_fields) -> str:
+    opcode_bits = JALR_OPCODE
+    rd_bits = get_register_index_binary(instruction_fields['rd'])
+    rs1_bits = get_register_index_binary(instruction_fields['rs1'])
+    funct3_bits = JALR_FUNCT3
+    imm_bits = get_immediate_binary_12(instruction_fields['imm'])
+    return imm_bits + rs1_bits + funct3_bits + rd_bits + opcode_bits
+
+
 def decode_b_instruction(instruction_fields, labels, instruction_address) -> str:
     opcode_bits = B_OPCODE
     rs1_bits = get_register_index_binary(instruction_fields['rs1'])
@@ -156,6 +165,8 @@ def assemble(filename) -> (str, str):
                     binary_code += decode_u_instruction(result) + "\n"
                 elif result['type'] == 'jal_instruction':
                     binary_code += decode_jal_instruction(result, labels, instruction_address) + "\n"
+                elif result['type'] == 'jalr_instruction':
+                    binary_code += decode_jalr_instruction(result) + "\n"
                 elif result['type'] == 'b_instruction':
                     binary_code += decode_b_instruction(result, labels, instruction_address) + "\n"
                 elif result['type'] == 's_instruction':
