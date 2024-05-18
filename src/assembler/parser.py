@@ -1,0 +1,108 @@
+import ply.yacc as yacc
+from src.assembler.tokenizer import tokens
+from src.assembler.instruction_info import *
+
+
+def p_expression_label(p):
+    """expression : LABEL_COLON NEWLINE"""
+    p[0] = {
+        'type': 'label',
+        'label': p[1].replace(":", ""),
+        'lineno': p.lineno(1)
+    }
+
+
+def p_expression_r_instruction(p):
+    """expression : ID register COMMA register COMMA register NEWLINE"""
+    p[0] = {
+        'type': 'r_instruction',
+        'opcode': p[1],
+        'rd': p[2].replace("x", ""),
+        'rs1': p[4].replace("x", ""),
+        'rs2': p[6].replace("x", ""),
+        'lineno': p.lineno(1)
+    }
+
+
+def p_statement_i_instruction(p):
+    """expression : ID register COMMA register COMMA IMMEDIATE NEWLINE"""
+    p[0] = {
+        'type': 'i_instruction',
+        'opcode': p[1],
+        'rd': p[2].replace("x", ""),
+        'rs1': p[4].replace("x", ""),
+        'imm': int(p[6]),
+        'lineno': p.lineno(1)
+    }
+
+
+def p_statement_i_load_instruction(p):
+    """expression : ID register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
+    if p[1] in I_LOAD_INSTRUCTIONS:
+        p[0] = {
+            'type': 'i_load_instruction',
+            'opcode': p[1],
+            'rd': p[2].replace("x", ""),
+            'rs1': p[6].replace("x", ""),
+            'imm': int(p[4]),
+            'lineno': p.lineno(1)
+        }
+    else:
+        p[0] = {
+            'type': 's_instruction',
+            'opcode': p[1],
+            'rs2': p[2].replace("x", ""),
+            'rs1': p[6].replace("x", ""),
+            'imm': int(p[4]),
+            'lineno': p.lineno(1)
+        }
+
+
+def p_statement_u_instruction(p):
+    """expression : ID register COMMA IMMEDIATE NEWLINE"""
+    p[0] = {
+        'type': 'u_instruction',
+        'opcode': p[1],
+        'rd': p[2].replace("x", ""),
+        'imm': int(p[4]),
+        'lineno': p.lineno(1)
+    }
+
+
+def p_expression_b_instruction(p):
+    """expression : ID register COMMA register COMMA ID NEWLINE"""
+    p[0] = {
+        'type': 'b_instruction',
+        'opcode': p[1],
+        'rs1': p[2].replace("x", ""),
+        'rs2': p[4].replace("x", ""),
+        'label': p[6],
+        'lineno': p.lineno(1)
+    }
+
+
+def p_register(p):
+    """register : REGISTER"""
+    reg_number = int(p[1][1:])
+    if (reg_number < 0) or (reg_number > 31):
+        print("Error at line " + str(p.lineno(1)) + ": Invalid register index.")
+    p[0] = p[1]
+
+
+def p_statement_newline(p):
+    """expression : NEWLINE"""
+    p[0] = {
+        'type': 'new_line',
+        'lineno': p.lineno(1)
+    }
+
+
+def p_error(p):
+    if p:
+        line_number = str(p.lineno)
+        print("Error at line " + line_number + ": Invalid or incomplete token" + " found '" + str(p.value) + "'")
+    else:
+        print("Error: Invalid or incomplete token found " + "Did you end with a newline?")
+
+
+paerser = yacc.yacc()
