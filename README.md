@@ -9,6 +9,6 @@ First, `cd` to the `src` directory. By default, the assembler takes the `example
 
 If you want to use another file as input, then you can run the `main.py` file with your input assembly file (here assumed to be named `my_asm.s` and in the same `src` directory):
 
-    $ python -i my_asm.s
+    $ python main.py -i my_asm.s
 
 The output files, both in textual binary and hexadeciaml, are placed in the `output` directory.
