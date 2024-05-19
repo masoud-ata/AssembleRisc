@@ -101,10 +101,10 @@ def p_expression_b_instruction(p):
     }
 
 
-def p_expression_compressed(p):
+def p_expression_compressed_r_instruction(p):
     """expression : COMPRESSED register COMMA register NEWLINE"""
     p[0] = {
-        'type': 'compressed_instruction',
+        'type': 'compressed_r_instruction',
         'opcode': p[1],
         'rd': p[2].replace("x", ""),
         'rs2': p[4].replace("x", ""),
