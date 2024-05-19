@@ -8,6 +8,7 @@ tokens = (
     'RIGHT_PAREN',
     'LABEL_COLON',
     'REGISTER',
+    'COMPRESSED',
     'ID',
     'NEWLINE'
 )
@@ -28,6 +29,12 @@ def t_LABEL_COLON(token):
 def t_REGISTER(token):
     r'x[0-9][0-9]?'
     token.type = "REGISTER"
+    return token
+
+
+def t_COMPRESSED(token):
+    r'c\.[a-z]+'
+    token.type = "COMPRESSED"
     return token
 
 

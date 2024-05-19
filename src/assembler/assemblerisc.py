@@ -124,6 +124,15 @@ def decode_s_instruction(instruction_fields) -> str:
     return imm_bits_11to5 + rs2_bits + rs1_bits + funct3_bits + imm_bits_4to0 + opcode_bits
 
 
+def decode_compressed_instruction(instruction_fields) -> str:
+    opcode_bits = '10'
+    if int(instruction_fields['rd']) == 0 or int(instruction_fields['rs2']) == 0:
+        print("Illegal operands @ line " + str(instruction_fields['lineno']))
+    rd_bits = get_register_index_binary(instruction_fields['rd'])
+    rs2_bits = get_register_index_binary(instruction_fields['rs2'])
+    return '100' + '1' + rd_bits + rs2_bits + opcode_bits
+
+
 def convert_to_hex(binary_code) -> str:
     hex_result = ""
     codes = binary_code.splitlines()
@@ -171,8 +180,12 @@ def assemble(filename) -> (str, str):
                     binary_code += decode_b_instruction(result, labels, instruction_address) + "\n"
                 elif result['type'] == 's_instruction':
                     binary_code += decode_s_instruction(result) + "\n"
+                elif result['type'] == 'compressed_instruction':
+                    binary_code += decode_compressed_instruction(result) + "\n"
 
-                if 'instruction' in result['type']:
+                if 'compressed_instruction' in result['type']:
+                    instruction_address += 2
+                elif 'instruction' in result['type']:
                     instruction_address += 4
 
             return binary_code, convert_to_hex(binary_code)
