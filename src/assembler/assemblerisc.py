@@ -1,6 +1,6 @@
-from src.assembler.tokenizer import reset_lineno
-from src.assembler.parser import paerser
-from src.assembler.instruction_info import *
+from assembler.tokenizer import reset_lineno
+from assembler.parser import paerser
+from assembler.instruction_info import *
 
 
 def get_register_index_binary(index) -> str:

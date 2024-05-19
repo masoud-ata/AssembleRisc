@@ -1,6 +1,6 @@
 import ply.yacc as yacc
-from src.assembler.tokenizer import tokens
-from src.assembler.instruction_info import *
+from assembler.tokenizer import tokens
+from assembler.instruction_info import *
 
 
 def p_expression_label(p):

@@ -1,4 +1,4 @@
-from src.assembler.assemblerisc import assemble
+from assembler.assemblerisc import assemble
 import argparse
 
 
