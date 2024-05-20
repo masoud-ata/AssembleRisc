@@ -27,7 +27,7 @@ def t_LABEL_COLON(token):
 
 
 def t_REGISTER(token):
-    r'x[0-9][0-9]?'
+    r'x3[0-1]|x2[0-9]|x1[0-9]|x[0-9]'
     token.type = "REGISTER"
     return token
 
