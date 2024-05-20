@@ -144,20 +144,33 @@ def decode_compressed_r_instruction(instruction) -> str:
         func_bit = COMPRESSED_R_FUNCT[instruction['opcode']]
         return '100' + func_bit + rd_bits + rs2_bits + opcode_bits
     else:
-        if (int(instruction['rd']) < 8 or int(instruction['rd']) > 15 or
-                int(instruction['rs2']) < 8 or int(instruction['rs2']) > 15):
+        if (
+                int(instruction['rd']) < 8 or int(instruction['rd']) > 15 or
+                int(instruction['rs2']) < 8 or int(instruction['rs2']) > 15
+        ):
             print("Illegal operands @ line " + str(instruction['lineno']))
         rd_bits = get_compressed_register_index_binary(instruction['rd'])
         rs2_bits = get_compressed_register_index_binary(instruction['rs2'])
-        func_bits = COMPRESSED_R_FUNCT[instruction['opcode']]
-        return '100' + '0' + '11' + rd_bits + func_bits + rs2_bits + opcode_bits
+        funct_bits = COMPRESSED_R_FUNCT[instruction['opcode']]
+        return '100' + '0' + '11' + rd_bits + funct_bits + rs2_bits + opcode_bits
 
 
 def decode_compressed_i_instruction(instruction) -> str:
-    opcode_bits = '01'
-    rd_bits = get_register_index_binary(instruction['rd'])
-    imm_bits = get_immediate_binary_6(instruction['imm'])
-    return '000' + imm_bits[0] + rd_bits + imm_bits[1:6] + opcode_bits
+    opcode_bits = COMPRESSED_I_OPCODE[instruction['opcode']]
+    if instruction['opcode'] in [INSTRUCTION_C_ADDI, INSTRUCTION_C_LI, INSTRUCTION_C_LUI, INSTRUCTION_C_SLLI]:
+        if instruction['opcode'] == INSTRUCTION_C_LUI and int(instruction['rd']) == 2:
+            print("Illegal operands @ line " + str(instruction['lineno']))
+        rd_bits = get_register_index_binary(instruction['rd'])
+        imm_bits = get_immediate_binary_6(instruction['imm'])
+        funct3_bits = COMPRESSED_I_FUNCT3[instruction['opcode']]
+        return funct3_bits + imm_bits[0] + rd_bits + imm_bits[1:6] + opcode_bits
+    else:
+        if int(instruction['rd']) < 8 or int(instruction['rd']) > 15:
+            print("Illegal operands @ line " + str(instruction['lineno']))
+        rd_bits = get_compressed_register_index_binary(instruction['rd'])
+        imm_bits = get_immediate_binary_6(instruction['imm'])
+        funct2_bits = COMPRESSED_I_FUNCT2[instruction['opcode']]
+        return '100' + imm_bits[0] + funct2_bits + rd_bits + imm_bits[1:6] + opcode_bits
     
     
 def convert_to_hex(binary_code) -> str:
