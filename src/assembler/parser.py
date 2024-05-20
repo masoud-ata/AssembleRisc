@@ -3,6 +3,13 @@ from assembler.tokenizer import tokens
 from assembler.instruction_info import *
 
 
+def to_int(field: str) -> int:
+    if '0x' in field:
+        return int(field, 16)
+    else:
+        return int(field)
+
+
 def p_expression_label(p):
     """expression : LABEL_COLON NEWLINE"""
     p[0] = {
@@ -31,7 +38,7 @@ def p_statement_i_instruction(p):
         'opcode': p[1],
         'rd': p[2].replace("x", ""),
         'rs1': p[4].replace("x", ""),
-        'imm': int(p[6]),
+        'imm': to_int(p[6]),
         'lineno': p.lineno(1)
     }
 
@@ -44,7 +51,7 @@ def p_statement_iload_s_jalr_instruction(p):
             'opcode': p[1],
             'rd': p[2].replace("x", ""),
             'rs1': p[6].replace("x", ""),
-            'imm': int(p[4]),
+            'imm': to_int(p[4]),
             'lineno': p.lineno(1)
         }
     elif p[1] in I_LOAD_INSTRUCTIONS:
@@ -53,7 +60,7 @@ def p_statement_iload_s_jalr_instruction(p):
             'opcode': p[1],
             'rd': p[2].replace("x", ""),
             'rs1': p[6].replace("x", ""),
-            'imm': int(p[4]),
+            'imm': to_int(p[4]),
             'lineno': p.lineno(1)
         }
     else:
@@ -62,7 +69,7 @@ def p_statement_iload_s_jalr_instruction(p):
             'opcode': p[1],
             'rs2': p[2].replace("x", ""),
             'rs1': p[6].replace("x", ""),
-            'imm': int(p[4]),
+            'imm': to_int(p[4]),
             'lineno': p.lineno(1)
         }
 
@@ -73,7 +80,7 @@ def p_statement_u_instruction(p):
         'type': 'u_instruction',
         'opcode': p[1],
         'rd': p[2].replace("x", ""),
-        'imm': int(p[4]),
+        'imm': to_int(p[4]),
         'lineno': p.lineno(1)
     }
 
@@ -118,7 +125,7 @@ def p_expression_compressed_i_instruction(p):
         'type': 'compressed_i_instruction',
         'opcode': p[1],
         'rd': p[2].replace("x", ""),
-        'imm': int(p[4]),
+        'imm': to_int(p[4]),
         'lineno': p.lineno(1)
     }
 

@@ -15,7 +15,7 @@ tokens = (
 
 
 t_COMMA = r','
-t_IMMEDIATE = r'[+-]?[0-9]+'
+t_IMMEDIATE = r'0x[0-9a-f]+|[+-]?[0-9]+'
 t_LEFT_PAREN = r'\('
 t_RIGHT_PAREN = r'\)'
 
