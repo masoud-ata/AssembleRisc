@@ -44,7 +44,7 @@ def _register_rename(reg_name: str) -> str:
     return replacements[reg_name]
 
 
-def get_register_index(reg_name: str) -> str:
+def get_x_register_index(reg_name: str) -> str:
     if 'x' not in reg_name:
         reg_name = _register_rename(reg_name).replace("x", "")
     return reg_name.replace("x", "")
