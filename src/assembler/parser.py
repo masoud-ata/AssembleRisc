@@ -112,6 +112,17 @@ def p_expression_compressed_r_instruction(p):
     }
 
 
+def p_expression_compressed_i_instruction(p):
+    """expression : COMPRESSED register COMMA IMMEDIATE NEWLINE"""
+    p[0] = {
+        'type': 'compressed_i_instruction',
+        'opcode': p[1],
+        'rd': p[2].replace("x", ""),
+        'imm': int(p[4]),
+        'lineno': p.lineno(1)
+    }
+
+
 def p_register(p):
     """register : REGISTER"""
     reg_number = int(p[1][1:])
