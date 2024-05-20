@@ -1,56 +1,10 @@
 from assembler.tokenizer import reset_lineno
 from assembler.parser import parser
 from assembler.instruction_info import *
+from assembler.immediate_generator import *
 
 
-def get_register_index_binary(index) -> str:
-    return '{0:05b}'.format(int(index))
-
-
-def get_compressed_register_index_binary(index) -> str:
-    return '{0:03b}'.format(int(index) - 8)
-
-
-def get_immediate_binary_5(value) -> str:
-    value &= 0x1f
-    return '{0:05b}'.format(int(value))
-
-
-def get_immediate_binary_6(value) -> str:
-    value &= 0x3f
-    return '{0:06b}'.format(int(value))
-
-
-def get_immediate_binary_12(value) -> str:
-    value &= 0xfff
-    return '{0:012b}'.format(int(value))
-
-
-def get_immediate_binary_12b(value) -> (str, str):
-    imm_bits = get_immediate_binary_12(value)
-    imm_bits_12_10to5 = imm_bits[0] + imm_bits[2:8]
-    imm_bits_4to1_11 = imm_bits[8:12] + imm_bits[1]
-    return imm_bits_12_10to5, imm_bits_4to1_11
-
-
-def get_immediate_binary_12s(value) -> (str, str):
-    imm_bits = get_immediate_binary_12(value)
-    imm_bits_11to5 = imm_bits[0:7]
-    imm_bits_4to0 = imm_bits[7:12]
-    return imm_bits_11to5, imm_bits_4to0
-
-
-def get_immediate_binary_20(value) -> str:
-    value &= 0xfffff
-    return '{0:020b}'.format(int(value))
-
-
-def get_immediate_binary_20_jal(value) -> str:
-    imm_bits = get_immediate_binary_20(value)
-    return imm_bits[0] + imm_bits[10:20] + imm_bits[9] + imm_bits[1:9]
-
-
-def decode_r_instruction(instruction) -> str:
+def _decode_r_instruction(instruction) -> str:
     opcode_bits = R_OPCODE
     rd_bits = get_register_index_binary(instruction['rd'])
     rs1_bits = get_register_index_binary(instruction['rs1'])
@@ -60,7 +14,7 @@ def decode_r_instruction(instruction) -> str:
     return funct7_bits + rs2_bits + rs1_bits + funct3_bits + rd_bits + opcode_bits
 
 
-def decode_i_instruction(instruction) -> str:
+def _decode_i_instruction(instruction) -> str:
     opcode_bits = I_OPCODE
     rd_bits = get_register_index_binary(instruction['rd'])
     rs1_bits = get_register_index_binary(instruction['rs1'])
@@ -69,7 +23,7 @@ def decode_i_instruction(instruction) -> str:
     return imm_bits + rs1_bits + funct3_bits + rd_bits + opcode_bits
 
 
-def decode_i_shift_instruction(instruction) -> str:
+def _decode_i_shift_instruction(instruction) -> str:
     opcode_bits = I_OPCODE
     rd_bits = get_register_index_binary(instruction['rd'])
     rs1_bits = get_register_index_binary(instruction['rs1'])
@@ -79,7 +33,7 @@ def decode_i_shift_instruction(instruction) -> str:
     return funct7_bits + imm_bits + rs1_bits + funct3_bits + rd_bits + opcode_bits
 
 
-def decode_i_load_instruction(instruction) -> str:
+def _decode_i_load_instruction(instruction) -> str:
     opcode_bits = I_LOAD_OPCODE
     rd_bits = get_register_index_binary(instruction['rd'])
     rs1_bits = get_register_index_binary(instruction['rs1'])
@@ -88,14 +42,14 @@ def decode_i_load_instruction(instruction) -> str:
     return imm_bits + rs1_bits + funct3_bits + rd_bits + opcode_bits
 
 
-def decode_u_instruction(instruction) -> str:
+def _decode_u_instruction(instruction) -> str:
     opcode_bits = U_OPCODE[instruction['opcode']]
     rd_bits = get_register_index_binary(instruction['rd'])
     imm_bits = get_immediate_binary_20(instruction['imm'])
     return imm_bits + rd_bits + opcode_bits
 
 
-def decode_jal_instruction(instruction, labels, instruction_address) -> str:
+def _decode_jal_instruction(instruction, labels, instruction_address) -> str:
     opcode_bits = JAL_OPCODE
     rd_bits = get_register_index_binary(instruction['rd'])
     target_address = labels[instruction['label']]
@@ -104,7 +58,7 @@ def decode_jal_instruction(instruction, labels, instruction_address) -> str:
     return imm_bits + rd_bits + opcode_bits
 
 
-def decode_jalr_instruction(instruction) -> str:
+def _decode_jalr_instruction(instruction) -> str:
     opcode_bits = JALR_OPCODE
     rd_bits = get_register_index_binary(instruction['rd'])
     rs1_bits = get_register_index_binary(instruction['rs1'])
@@ -113,7 +67,7 @@ def decode_jalr_instruction(instruction) -> str:
     return imm_bits + rs1_bits + funct3_bits + rd_bits + opcode_bits
 
 
-def decode_b_instruction(instruction, labels, instruction_address) -> str:
+def _decode_b_instruction(instruction, labels, instruction_address) -> str:
     opcode_bits = B_OPCODE
     rs1_bits = get_register_index_binary(instruction['rs1'])
     rs2_bits = get_register_index_binary(instruction['rs2'])
@@ -124,7 +78,7 @@ def decode_b_instruction(instruction, labels, instruction_address) -> str:
     return imm_bits_12_10to5 + rs2_bits + rs1_bits + funct3_bits + imm_bits_4to1_11 + opcode_bits
 
 
-def decode_s_instruction(instruction) -> str:
+def _decode_s_instruction(instruction) -> str:
     opcode_bits = S_OPCODE
     rs1_bits = get_register_index_binary(instruction['rs1'])
     rs2_bits = get_register_index_binary(instruction['rs2'])
@@ -133,7 +87,7 @@ def decode_s_instruction(instruction) -> str:
     return imm_bits_11to5 + rs2_bits + rs1_bits + funct3_bits + imm_bits_4to0 + opcode_bits
 
 
-def decode_compressed_r_instruction(instruction) -> str:
+def _decode_compressed_r_instruction(instruction) -> str:
     opcode_bits = '01'
     if instruction['opcode'] in [INSTRUCTION_C_ADD, INSTRUCTION_C_MV]:
         opcode_bits = '10'
@@ -155,7 +109,7 @@ def decode_compressed_r_instruction(instruction) -> str:
         return '100' + '0' + '11' + rd_bits + funct_bits + rs2_bits + opcode_bits
 
 
-def decode_compressed_i_instruction(instruction) -> str:
+def _decode_compressed_i_instruction(instruction) -> str:
     opcode_bits = COMPRESSED_I_OPCODE[instruction['opcode']]
     if instruction['opcode'] in [INSTRUCTION_C_ADDI, INSTRUCTION_C_LI, INSTRUCTION_C_LUI, INSTRUCTION_C_SLLI]:
         if instruction['opcode'] == INSTRUCTION_C_LUI and int(instruction['rd']) == 2:
@@ -171,9 +125,19 @@ def decode_compressed_i_instruction(instruction) -> str:
         imm_bits = get_immediate_binary_6(instruction['imm'])
         funct2_bits = COMPRESSED_I_FUNCT2[instruction['opcode']]
         return '100' + imm_bits[0] + funct2_bits + rd_bits + imm_bits[1:6] + opcode_bits
-    
-    
-def convert_to_hex(binary_code) -> str:
+
+
+def _decode_compressed_b_instruction(instruction, labels, instruction_address) -> str:
+    opcode_bits = '01'
+    rs1_bits = get_compressed_register_index_binary(instruction['rs1'])
+    funct3_bits = COMPRESSED_B_FUNCT3[instruction['opcode']]
+    target_address = labels[instruction['label']]
+    imm_value = (target_address - instruction_address) // 2
+    imm_bits_8_4to3, imm_bits_7to6_2to1_5 = get_immediate_binary_8_compressed_b(imm_value)
+    return funct3_bits + imm_bits_8_4to3 + rs1_bits + imm_bits_7to6_2to1_5 + opcode_bits
+
+
+def _convert_to_hex(binary_code) -> str:
     hex_result = ""
     codes = binary_code.splitlines()
     for code in codes:
@@ -195,7 +159,10 @@ def assemble(filename) -> (str, str):
                 if result['type'] == 'label':
                     labels[result['label']] = instruction_address
                 else:
-                    instruction_address += 4
+                    if 'compressed' in result['type']:
+                        instruction_address += 2
+                    elif 'instruction' in result['type']:
+                        instruction_address += 4
 
             binary_code = ""
             instruction_address = 0
@@ -206,35 +173,37 @@ def assemble(filename) -> (str, str):
                 # print(result)
 
                 if result['type'] == 'r_instruction':
-                    binary_code += decode_r_instruction(result) + "\n"
+                    binary_code += _decode_r_instruction(result) + "\n"
                 elif result['type'] == 'i_instruction':
                     if result['opcode'] in I_SHIFT_INSTRUCTION:
-                        binary_code += decode_i_shift_instruction(result) + "\n"
+                        binary_code += _decode_i_shift_instruction(result) + "\n"
                     else:
-                        binary_code += decode_i_instruction(result) + "\n"
+                        binary_code += _decode_i_instruction(result) + "\n"
                 elif result['type'] == 'i_load_instruction':
-                    binary_code += decode_i_load_instruction(result) + "\n"
+                    binary_code += _decode_i_load_instruction(result) + "\n"
                 elif result['type'] == 'u_instruction':
-                    binary_code += decode_u_instruction(result) + "\n"
+                    binary_code += _decode_u_instruction(result) + "\n"
                 elif result['type'] == 'jal_instruction':
-                    binary_code += decode_jal_instruction(result, labels, instruction_address) + "\n"
+                    binary_code += _decode_jal_instruction(result, labels, instruction_address) + "\n"
                 elif result['type'] == 'jalr_instruction':
-                    binary_code += decode_jalr_instruction(result) + "\n"
+                    binary_code += _decode_jalr_instruction(result) + "\n"
                 elif result['type'] == 'b_instruction':
-                    binary_code += decode_b_instruction(result, labels, instruction_address) + "\n"
+                    binary_code += _decode_b_instruction(result, labels, instruction_address) + "\n"
                 elif result['type'] == 's_instruction':
-                    binary_code += decode_s_instruction(result) + "\n"
+                    binary_code += _decode_s_instruction(result) + "\n"
                 elif result['type'] == 'compressed_r_instruction':
-                    binary_code += decode_compressed_r_instruction(result) + "\n"
+                    binary_code += _decode_compressed_r_instruction(result) + "\n"
                 elif result['type'] == 'compressed_i_instruction':
-                    binary_code += decode_compressed_i_instruction(result) + "\n"
+                    binary_code += _decode_compressed_i_instruction(result) + "\n"
+                elif result['type'] == 'compressed_b_instruction':
+                    binary_code += _decode_compressed_b_instruction(result, labels, instruction_address) + "\n"
 
-                if 'compressed_instruction' in result['type']:
+                if 'compressed' in result['type']:
                     instruction_address += 2
                 elif 'instruction' in result['type']:
                     instruction_address += 4
 
-            return binary_code, convert_to_hex(binary_code)
+            return binary_code, _convert_to_hex(binary_code)
     except IOError:
         print("No such file!")
         return "", ""

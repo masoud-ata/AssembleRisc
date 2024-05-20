@@ -110,7 +110,7 @@ def p_expression_b_instruction(p):
 
 
 def p_expression_compressed_r_instruction(p):
-    """expression : COMPRESSED register COMMA register NEWLINE"""
+    """expression : COMPRESSED_ID register COMMA register NEWLINE"""
     p[0] = {
         'type': 'compressed_r_instruction',
         'opcode': p[1],
@@ -121,12 +121,23 @@ def p_expression_compressed_r_instruction(p):
 
 
 def p_expression_compressed_i_instruction(p):
-    """expression : COMPRESSED register COMMA IMMEDIATE NEWLINE"""
+    """expression : COMPRESSED_ID register COMMA IMMEDIATE NEWLINE"""
     p[0] = {
         'type': 'compressed_i_instruction',
         'opcode': p[1],
         'rd': get_x_register_index(p[2]),
         'imm': to_int(p[4]),
+        'lineno': p.lineno(1)
+    }
+
+
+def p_expression_compressed_b_instruction(p):
+    """expression : COMPRESSED_ID register COMMA ID NEWLINE"""
+    p[0] = {
+        'type': 'compressed_b_instruction',
+        'opcode': p[1],
+        'rs1': get_x_register_index(p[2]),
+        'label': p[4],
         'lineno': p.lineno(1)
     }
 

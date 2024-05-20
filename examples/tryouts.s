@@ -1,12 +1,23 @@
-c.addi x1, -10
-c.slli x1, 0x3f
-c.li x1, -22
-c.lui x3, 21
-c.andi x9, 2
-c.srli x8, 2
-c.srai x8, 2
-addi x1, x0, -1
-lui x2, 0xff124
-lui x2, 1044772
-InnerLoop:
+loop:
+add x1, a1, a2
+c.addi a1, 0x1
+c.beqz x8, ll
+c.add x1, x1
+sub x1, x1, x1
+sll x1, x1, x1
+slt x1, x1, x1
+sltu x1, x1, x1
+xor x1, x1, x1
+srl x1, x1, x1
+sra x1, x1, x1
+or x1, x1, x1
+and x1, x1, x1
+andi x1, x2, 1
+xori x1, x2, -1
+slli x1, x2, 1
+srli x1, x2, 1
+srai x1, x2, 1
+ll:
+c.bnez x8, loop
+
 

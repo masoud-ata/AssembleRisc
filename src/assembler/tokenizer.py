@@ -8,7 +8,7 @@ tokens = (
     'RIGHT_PAREN',
     'LABEL_COLON',
     'REGISTER',
-    'COMPRESSED',
+    'COMPRESSED_ID',
     'ID',
     'NEWLINE'
 )
@@ -34,9 +34,9 @@ def t_REGISTER(token):
     return token
 
 
-def t_COMPRESSED(token):
+def t_COMPRESSED_ID(token):
     r'c\.[a-z]+'
-    token.type = "COMPRESSED"
+    token.type = "COMPRESSED_ID"
     return token
 
 
