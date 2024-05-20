@@ -1,4 +1,4 @@
-from assembler.assemblerisc import assemble
+from assembler.assemblerisc import AssembleRisc
 import argparse
 
 
@@ -15,10 +15,24 @@ def write_output_file(filename, content):
         file.write(content)
 
 
+def _convert_to_hex(binary_code) -> str:
+    hex_result = ""
+    codes = binary_code.splitlines()
+    for code in codes:
+        is_compressed = len(code) == 16
+        if is_compressed:
+            hex_result += '{0:04x}'.format(int(code, 2)) + "\n"
+        else:
+            hex_result += '{0:08x}'.format(int(code, 2)) + "\n"
+    return hex_result
+
+
 def main():
     input_filename = get_args()
 
-    binary_code, hex_code = assemble(input_filename)
+    assembler = AssembleRisc()
+    binary_code = assembler.assemble(input_filename)
+    hex_code = _convert_to_hex(binary_code)
 
     write_output_file('../output/out_binary.txt', binary_code)
     write_output_file('../output/out_hexadeciaml.txt', hex_code)
