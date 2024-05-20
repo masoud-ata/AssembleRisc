@@ -142,6 +142,28 @@ def p_expression_compressed_b_instruction(p):
     }
 
 
+def p_statement_compressed_l_instruction(p):
+    """expression : COMPRESSED_ID register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
+    if p[1] == INSTRUCTION_C_LW:
+        p[0] = {
+            'type': 'compressed_l_load_instruction',
+            'opcode': p[1],
+            'rd': get_x_register_index(p[2]),
+            'rs1': get_x_register_index(p[6]),
+            'imm': to_int(p[4]),
+            'lineno': p.lineno(1)
+        }
+    else:
+        p[0] = {
+            'type': 'compressed_l_store_instruction',
+            'opcode': p[1],
+            'rs2': get_x_register_index(p[2]),
+            'rs1': get_x_register_index(p[6]),
+            'imm': to_int(p[4]),
+            'lineno': p.lineno(1)
+        }
+
+
 def p_register(p):
     """register : REGISTER"""
     reg_number = int(get_x_register_index(p[1]))

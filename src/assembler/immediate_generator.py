@@ -55,3 +55,11 @@ def get_immediate_binary_8_compressed_b(value) -> (str, str):
     imm_bits_7to6_2to1_5 = imm_bits[1:3] + imm_bits[6:8] + imm_bits[3]
     imm_bits_8_4to3 = imm_bits[0] + imm_bits[4:6]
     return imm_bits_8_4to3, imm_bits_7to6_2to1_5
+
+
+def get_immediate_binary_5_compressed_l(value) -> (str, str):
+    value //= 4
+    imm_bits = get_immediate_binary_5(value)
+    imm_bits_5to3 = imm_bits[1:4]
+    imm_bits_2_6 = imm_bits[4] + imm_bits[0]
+    return imm_bits_5to3, imm_bits_2_6

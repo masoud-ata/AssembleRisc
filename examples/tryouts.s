@@ -19,5 +19,7 @@ srli x1, x2, 1
 srai x1, x2, 1
 ll:
 c.bnez x8, loop
+c.lw x8, 44(x8)
+c.sw x9, 0x14(x10)
 
 

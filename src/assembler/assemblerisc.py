@@ -137,6 +137,28 @@ def _decode_compressed_b_instruction(instruction, labels, instruction_address) -
     return funct3_bits + imm_bits_8_4to3 + rs1_bits + imm_bits_7to6_2to1_5 + opcode_bits
 
 
+def _decode_compressed_l_load_instruction(instruction) -> str:
+    opcode_bits = '00'
+    rd_bits = get_compressed_register_index_binary(instruction['rd'])
+    rs1_bits = get_compressed_register_index_binary(instruction['rs1'])
+    funct3_bits = COMPRESSED_L_FUNCT3[instruction['opcode']]
+    if int(instruction['imm']) % 4 != 0:
+        print("Illegal operands @ line " + str(instruction['lineno']))
+    imm_bits_5to3, imm_bits_2_6 = get_immediate_binary_5_compressed_l(instruction['imm'])
+    return funct3_bits + imm_bits_5to3 + rs1_bits + imm_bits_2_6 + rd_bits + opcode_bits
+
+
+def _decode_compressed_l_store_instruction(instruction) -> str:
+    opcode_bits = '00'
+    rs2_bits = get_compressed_register_index_binary(instruction['rs2'])
+    rs1_bits = get_compressed_register_index_binary(instruction['rs1'])
+    funct3_bits = COMPRESSED_L_FUNCT3[instruction['opcode']]
+    if int(instruction['imm']) % 4 != 0:
+        print("Illegal operands @ line " + str(instruction['lineno']))
+    imm_bits_5to3, imm_bits_2_6 = get_immediate_binary_5_compressed_l(instruction['imm'])
+    return funct3_bits + imm_bits_5to3 + rs1_bits + imm_bits_2_6 + rs2_bits + opcode_bits
+
+
 def _convert_to_hex(binary_code) -> str:
     hex_result = ""
     codes = binary_code.splitlines()
@@ -197,6 +219,10 @@ def assemble(filename) -> (str, str):
                     binary_code += _decode_compressed_i_instruction(result) + "\n"
                 elif result['type'] == 'compressed_b_instruction':
                     binary_code += _decode_compressed_b_instruction(result, labels, instruction_address) + "\n"
+                elif result['type'] == 'compressed_l_load_instruction':
+                    binary_code += _decode_compressed_l_load_instruction(result) + "\n"
+                elif result['type'] == 'compressed_l_store_instruction':
+                    binary_code += _decode_compressed_l_store_instruction(result) + "\n"
 
                 if 'compressed' in result['type']:
                     instruction_address += 2
