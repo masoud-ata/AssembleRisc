@@ -16,9 +16,9 @@ def write_output_file(filename, content):
 
 
 def main():
-    input_file = get_args()
+    input_filename = get_args()
 
-    binary_code, hex_code = assemble(input_file)
+    binary_code, hex_code = assemble(input_filename)
 
     write_output_file('../output/out_binary.txt', binary_code)
     write_output_file('../output/out_hexadeciaml.txt', hex_code)

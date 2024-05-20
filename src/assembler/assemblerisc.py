@@ -1,5 +1,5 @@
 from assembler.tokenizer import reset_lineno
-from assembler.parser import paerser
+from assembler.parser import parser
 from assembler.instruction_info import *
 
 
@@ -191,7 +191,7 @@ def assemble(filename) -> (str, str):
             instruction_address = 0
             labels = {}
             for line in file:
-                result = paerser.parse(line)
+                result = parser.parse(line)
                 if result['type'] == 'label':
                     labels[result['label']] = instruction_address
                 else:
@@ -202,7 +202,7 @@ def assemble(filename) -> (str, str):
             file.seek(0, 0)
             reset_lineno()
             for line in file:
-                result = paerser.parse(line)
+                result = parser.parse(line)
                 # print(result)
 
                 if result['type'] == 'r_instruction':

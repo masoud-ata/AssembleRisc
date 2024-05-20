@@ -1,6 +1,7 @@
 import ply.yacc as yacc
 from assembler.tokenizer import tokens
 from assembler.instruction_info import *
+from assembler.pre_process import get_register_index
 
 
 def to_int(field: str) -> int:
@@ -24,9 +25,9 @@ def p_expression_r_instruction(p):
     p[0] = {
         'type': 'r_instruction',
         'opcode': p[1],
-        'rd': p[2].replace("x", ""),
-        'rs1': p[4].replace("x", ""),
-        'rs2': p[6].replace("x", ""),
+        'rd': get_register_index(p[2]),
+        'rs1': get_register_index(p[4]),
+        'rs2': get_register_index(p[6]),
         'lineno': p.lineno(1)
     }
 
@@ -36,8 +37,8 @@ def p_statement_i_instruction(p):
     p[0] = {
         'type': 'i_instruction',
         'opcode': p[1],
-        'rd': p[2].replace("x", ""),
-        'rs1': p[4].replace("x", ""),
+        'rd': get_register_index(p[2]),
+        'rs1': get_register_index(p[4]),
         'imm': to_int(p[6]),
         'lineno': p.lineno(1)
     }
@@ -49,8 +50,8 @@ def p_statement_iload_s_jalr_instruction(p):
         p[0] = {
             'type': 'jalr_instruction',
             'opcode': p[1],
-            'rd': p[2].replace("x", ""),
-            'rs1': p[6].replace("x", ""),
+            'rd': get_register_index(p[2]),
+            'rs1': get_register_index(p[6]),
             'imm': to_int(p[4]),
             'lineno': p.lineno(1)
         }
@@ -58,8 +59,8 @@ def p_statement_iload_s_jalr_instruction(p):
         p[0] = {
             'type': 'i_load_instruction',
             'opcode': p[1],
-            'rd': p[2].replace("x", ""),
-            'rs1': p[6].replace("x", ""),
+            'rd': get_register_index(p[2]),
+            'rs1': get_register_index(p[6]),
             'imm': to_int(p[4]),
             'lineno': p.lineno(1)
         }
@@ -67,8 +68,8 @@ def p_statement_iload_s_jalr_instruction(p):
         p[0] = {
             'type': 's_instruction',
             'opcode': p[1],
-            'rs2': p[2].replace("x", ""),
-            'rs1': p[6].replace("x", ""),
+            'rs2': get_register_index(p[2]),
+            'rs1': get_register_index(p[6]),
             'imm': to_int(p[4]),
             'lineno': p.lineno(1)
         }
@@ -79,7 +80,7 @@ def p_statement_u_instruction(p):
     p[0] = {
         'type': 'u_instruction',
         'opcode': p[1],
-        'rd': p[2].replace("x", ""),
+        'rd': get_register_index(p[2]),
         'imm': to_int(p[4]),
         'lineno': p.lineno(1)
     }
@@ -90,7 +91,7 @@ def p_expression_jal_instruction(p):
     p[0] = {
         'type': 'jal_instruction',
         'opcode': p[1],
-        'rd': p[2].replace("x", ""),
+        'rd': get_register_index(p[2]),
         'label': p[4],
         'lineno': p.lineno(1)
     }
@@ -101,8 +102,8 @@ def p_expression_b_instruction(p):
     p[0] = {
         'type': 'b_instruction',
         'opcode': p[1],
-        'rs1': p[2].replace("x", ""),
-        'rs2': p[4].replace("x", ""),
+        'rs1': get_register_index(p[2]),
+        'rs2': get_register_index(p[4]),
         'label': p[6],
         'lineno': p.lineno(1)
     }
@@ -113,8 +114,8 @@ def p_expression_compressed_r_instruction(p):
     p[0] = {
         'type': 'compressed_r_instruction',
         'opcode': p[1],
-        'rd': p[2].replace("x", ""),
-        'rs2': p[4].replace("x", ""),
+        'rd': get_register_index(p[2]),
+        'rs2': get_register_index(p[4]),
         'lineno': p.lineno(1)
     }
 
@@ -124,7 +125,7 @@ def p_expression_compressed_i_instruction(p):
     p[0] = {
         'type': 'compressed_i_instruction',
         'opcode': p[1],
-        'rd': p[2].replace("x", ""),
+        'rd': get_register_index(p[2]),
         'imm': to_int(p[4]),
         'lineno': p.lineno(1)
     }
@@ -132,7 +133,7 @@ def p_expression_compressed_i_instruction(p):
 
 def p_register(p):
     """register : REGISTER"""
-    reg_number = int(p[1][1:])
+    reg_number = int(get_register_index(p[1]))
     if (reg_number < 0) or (reg_number > 31):
         print("Error at line " + str(p.lineno(1)) + ": Invalid register index.")
     p[0] = p[1]
@@ -154,4 +155,4 @@ def p_error(p):
         print("Error: Invalid or incomplete token found " + "Did you end with a newline?")
 
 
-paerser = yacc.yacc()
+parser = yacc.yacc()
