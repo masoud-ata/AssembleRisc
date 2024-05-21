@@ -13,5 +13,6 @@ srli x15, x21, 8
 srai x18, x13, 31
 c.j -2048
 c.jal 1022
-
+c.jr x17
+c.jalr x29
 
