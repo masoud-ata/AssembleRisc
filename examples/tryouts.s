@@ -11,6 +11,7 @@ jalr x27, -1024(x1)
 slli x5, x11, 4
 srli x15, x21, 8
 srai x18, x13, 31
-
+c.j -2048
+c.jal 1022
 
 

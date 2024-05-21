@@ -24,7 +24,8 @@ class AssembleRisc:
             'compressed_i_instruction': self._decode_compressed_i_instruction,
             'compressed_b_instruction': self._decode_compressed_b_instruction,
             'compressed_l_load_instruction': self._decode_compressed_l_load_instruction,
-            'compressed_l_store_instruction': self._decode_compressed_l_store_instruction
+            'compressed_l_store_instruction': self._decode_compressed_l_store_instruction,
+            'compressed_j_instruction': self._decode_compressed_j_instruction
         }
 
     def _decode_r_instruction(self) -> str:
@@ -179,6 +180,13 @@ class AssembleRisc:
             print("Illegal operands @ line " + str(instruction['lineno']))
         imm_bits_5to3, imm_bits_2_6 = get_immediate_binary_5_compressed_l(instruction['imm'])
         return funct3_bits + imm_bits_5to3 + rs1_bits + imm_bits_2_6 + rs2_bits + opcode_bits
+
+    def _decode_compressed_j_instruction(self) -> str:
+        instruction = self.parse_info
+        opcode_bits = '01'
+        imm_bits = get_immediate_binary_11_compressed_j(instruction['imm'])
+        funct3_bits = COMPRESSED_J_FUNCT3[instruction['opcode']]
+        return funct3_bits + imm_bits + opcode_bits
 
     def find_labels_pass(self) -> None:
         self.instruction_address = 0

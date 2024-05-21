@@ -55,8 +55,8 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |    c.or     |   CA   |  &check;  |   c.andi    |   CB   |  &check;  |
 |    c.xor    |   CA   |  &check;  |    c.add    |   CR   |  &check;  |
 |    c.sub    |   CA   |  &check;  |    c.mv     |   CR   |  &check;  |
-|    c.lw     |   CL   |  &check;  | 
-|    c.sw     |   CS   |  &check;  | 
+|    c.lw     |   CL   |  &check;  |     c.j     |   CJ   |  &check;  |
+|    c.sw     |   CS   |  &check;  |    c.jal    |   CJ   |  &check;  |
 |   c.beqz    |   CB   |  &check;  | 
 |   c.bneq    |   CB   |  &check;  | 
 |    c.li     |   CI   |  &check;  | 

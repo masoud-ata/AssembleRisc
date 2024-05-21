@@ -167,6 +167,16 @@ def p_statement_compressed_l_instruction(p):
         }
 
 
+def p_expression_compressed_j_instruction(p):
+    """expression : COMPRESSED_ID IMMEDIATE NEWLINE"""
+    p[0] = {
+        'type': 'compressed_j_instruction',
+        'opcode': p[1],
+        'imm': to_int(p[2]),
+        'lineno': p.lineno(1)
+    }
+
+
 def p_register(p):
     """register : REGISTER"""
     reg_number = int(get_x_register_index(p[1]))
