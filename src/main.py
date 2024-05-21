@@ -1,5 +1,6 @@
-from assembler.assemblerisc import AssembleRisc
 import argparse
+
+from assembler.assemblerisc import AssembleRisc
 
 
 def get_args() -> str:

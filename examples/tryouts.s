@@ -1,25 +1,16 @@
-loop:
-add x1, a1, a2
-c.addi a1, 0x1
-c.beqz x8, ll
-c.add x1, x1
-sub x1, x1, x1
-sll x1, x1, x1
-slt x1, x1, x1
-sltu x1, x1, x1
-xor x1, x1, x1
-srl x1, x1, x1
-sra x1, x1, x1
-or x1, x1, x1
-and x1, x1, x1
-andi x1, x2, 1
-xori x1, x2, -1
-slli x1, x2, 1
-srli x1, x2, 1
-srai x1, x2, 1
-ll:
-c.bnez x8, loop
-c.lw x8, 44(x8)
-c.sw x9, 0x14(x10)
+addi x31, x0, -56
+addi x24, x0, -100
+addi x30, x0, 102
+c.li x15, 1
+c.addi x15, 9
+addi x16, x0, 1
+addi x1, x0, 0
+auipc x1, 2
+jal x27, -524288
+jalr x27, -1024(x1)
+slli x5, x11, 4
+srli x15, x21, 8
+srai x18, x13, 31
+
 
 

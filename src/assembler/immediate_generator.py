@@ -46,6 +46,7 @@ def get_immediate_binary_20(value) -> str:
 
 
 def get_immediate_binary_20_jal(value) -> str:
+    value >>= 1
     imm_bits = get_immediate_binary_20(value)
     return imm_bits[0] + imm_bits[10:20] + imm_bits[9] + imm_bits[1:9]
 

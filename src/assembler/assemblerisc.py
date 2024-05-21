@@ -15,6 +15,7 @@ class AssembleRisc:
             'i_instruction': self._decode_i_instruction,
             'i_shift_instruction': self._decode_i_shift_instruction,
             'i_load_instruction': self._decode_i_load_instruction,
+            'u_instruction': self._decode_u_instruction,
             'jal_instruction': self._decode_jal_instruction,
             'jalr_instruction': self._decode_jalr_instruction,
             'b_instruction': self._decode_b_instruction,
@@ -38,15 +39,12 @@ class AssembleRisc:
 
     def _decode_i_instruction(self) -> str:
         instruction = self.parse_info
-        if instruction['opcode'] in I_SHIFT_INSTRUCTION:
-            return self._decode_i_shift_instruction()
-        else:
-            opcode_bits = I_OPCODE
-            rd_bits = get_register_index_binary(instruction['rd'])
-            rs1_bits = get_register_index_binary(instruction['rs1'])
-            funct3_bits = I_FUNCT3[instruction['opcode']]
-            imm_bits = get_immediate_binary_12(instruction['imm'])
-            return imm_bits + rs1_bits + funct3_bits + rd_bits + opcode_bits
+        opcode_bits = I_OPCODE
+        rd_bits = get_register_index_binary(instruction['rd'])
+        rs1_bits = get_register_index_binary(instruction['rs1'])
+        funct3_bits = I_FUNCT3[instruction['opcode']]
+        imm_bits = get_immediate_binary_12(instruction['imm'])
+        return imm_bits + rs1_bits + funct3_bits + rd_bits + opcode_bits
 
     def _decode_i_shift_instruction(self) -> str:
         instruction = self.parse_info
@@ -78,9 +76,7 @@ class AssembleRisc:
         instruction = self.parse_info
         opcode_bits = JAL_OPCODE
         rd_bits = get_register_index_binary(instruction['rd'])
-        target_address = self.labels_table[instruction['label']]
-        imm_value = (target_address - self.instruction_address) // 2
-        imm_bits = get_immediate_binary_20_jal(imm_value)
+        imm_bits = get_immediate_binary_20_jal(instruction['imm'])
         return imm_bits + rd_bits + opcode_bits
 
     def _decode_jalr_instruction(self) -> str:

@@ -1,4 +1,5 @@
 import ply.yacc as yacc
+
 from assembler.tokenizer import tokens
 from assembler.instruction_info import *
 from assembler.pre_process import get_x_register_index
@@ -34,8 +35,9 @@ def p_expression_r_instruction(p):
 
 def p_statement_i_instruction(p):
     """expression : ID register COMMA register COMMA IMMEDIATE NEWLINE"""
+    instruction = 'i_shift_instruction' if p[1] in I_SHIFT_INSTRUCTIONS else 'i_instruction'
     p[0] = {
-        'type': 'i_instruction',
+        'type': instruction,
         'opcode': p[1],
         'rd': get_x_register_index(p[2]),
         'rs1': get_x_register_index(p[4]),
@@ -77,8 +79,9 @@ def p_statement_iload_s_jalr_instruction(p):
 
 def p_statement_u_instruction(p):
     """expression : ID register COMMA IMMEDIATE NEWLINE"""
+    instruction = 'jal_instruction' if p[1] == INSTRUCTION_JAL else 'u_instruction'
     p[0] = {
-        'type': 'u_instruction',
+        'type': instruction,
         'opcode': p[1],
         'rd': get_x_register_index(p[2]),
         'imm': to_int(p[4]),
