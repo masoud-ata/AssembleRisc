@@ -47,3 +47,20 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |     lw      |   I    |  &check;  |   csrrsi    |   I    |    | 
 |     lbu     |   I    |  &check;  |   csrrci    |   I    |    | 
 |     lhu     |   I    |  &check;  |   
+
+### RV32C
+| Instruction | Format | Supported | Instruction | Format | Supported | 
+|:-----------:|:------:|:---------:|:-----------:|:------:|:---------:|
+|    c.and    |   CA   |  &check;  |   c.srai    |   CB   |  &check;  |
+|    c.or     |   CA   |  &check;  |   c.andi    |   CB   |  &check;  |
+|    c.xor    |   CA   |  &check;  |    c.add    |   CR   |  &check;  |
+|    c.sub    |   CA   |  &check;  |    c.mv     |   CR   |  &check;  |
+|    c.lw     |   CL   |  &check;  | 
+|    c.sw     |   CS   |  &check;  | 
+|   c.beqz    |   CB   |  &check;  | 
+|   c.bneq    |   CB   |  &check;  | 
+|    c.li     |   CI   |  &check;  | 
+|    c.lui    |   CI   |  &check;  | 
+|   c.addi    |   CI   |  &check;  | 
+|   c.slli    |   CI   |  &check;  | 
+|   c.srli    |   CB   |  &check;  | 
