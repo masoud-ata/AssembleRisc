@@ -18,4 +18,11 @@ c.jalr x29
 nop
 nop
 addi x0, x0, 0
-
+mul x12, x10, x5
+mulh x31, t0, a1
+mulhsu x1, x11, x2
+mulhu t2, t4, t5
+div x21, x13, x15
+divu x21, x13, x15
+rem x21, x13, x15
+remu x20, x30, x29

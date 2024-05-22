@@ -63,4 +63,13 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |    c.lui    |   CI   |  &check;  | 
 |   c.addi    |   CI   |  &check;  | 
 |   c.slli    |   CI   |  &check;  | 
-|   c.srli    |   CB   |  &check;  | 
+|   c.srli    |   CB   |  &check;  |
+
+### RV32M
+| Instruction | Format | Supported | Instruction | Format | Supported | 
+|:-----------:|:------:|:---------:|:-----------:|:------:|:---------:|
+|     mul     |   R    |  &check;  |     div     |   R    |  &check;  |
+|    mulh     |   R    |  &check;  |    divu     |   R    |  &check;  |
+|   mulhsu    |   R    |  &check;  |     rem     |   R    |  &check;  |
+|    mulhu    |   R    |  &check;  |    remu     |   R    |  &check;  |
+
