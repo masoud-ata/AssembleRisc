@@ -1,5 +1,5 @@
 # AssembleRisc
-A Python assembler for RISC-V
+A Python assembler for RISC-V with support for RV32I, RV32C, RV32M, and RV32F extensions
 
 
 ## Requirements
@@ -79,5 +79,4 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |   fadd.s    |   R    |  &check;  |    feq.s    |   R    |  &check;  |
 |   fsub.s    |   R    |  &check;  |    flt.s    |   R    |  &check;  |    
 |   fmul.s    |   R    |  &check;  |    fle.s    |   R    |  &check;  |    
-|   fdiv.s    |   R    |  &check;  |   
-
+|   fdiv.s    |   R    |  &check;  |   fsqrt.s   |   R    |  &check;  | 

@@ -249,6 +249,35 @@ def p_expression_floating_point_r_destination_x_instruction(p):
     }
 
 
+def p_expression_floating_point_r_2_reg_instruction(p):
+    """expression : ID f_register COMMA f_register NEWLINE"""
+    p[0] = {
+        'type': 'floating_point_r_instruction',
+        'opcode': p[1],
+        'rd': get_f_register_index(p[2]),
+        'rs1': get_f_register_index(p[4]),
+        'rs2': '0',
+        'rm_funct3': FLOATING_POINT_ROUNDING_MODES['dyn'],
+        'lineno': p.lineno(1)
+    }
+
+
+def p_expression_floating_point_r_2_reg_with_rm_instruction(p):
+    """expression : ID f_register COMMA f_register COMMA ID NEWLINE"""
+    rm = p[6]
+    if rm not in FLOATING_POINT_ROUNDING_MODES:
+        print("Error: illegal operands at line %s" % p.lineno(1))
+    p[0] = {
+        'type': 'floating_point_r_instruction',
+        'opcode': p[1],
+        'rd': get_f_register_index(p[2]),
+        'rs1': get_f_register_index(p[4]),
+        'rs2': '0',
+        'rm_funct3': FLOATING_POINT_ROUNDING_MODES[p[6]],
+        'lineno': p.lineno(1)
+    }
+
+
 def p_register(p):
     """register : REGISTER"""
     reg_number = int(get_x_register_index(p[1]))
