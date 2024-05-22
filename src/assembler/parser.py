@@ -204,13 +204,18 @@ def p_expression_compressed_j_r_instruction(p):
 
 def p_expression_floating_point_r_instruction(p):
     """expression : ID f_register COMMA f_register COMMA f_register NEWLINE"""
+    opcode = p[1]
+    if opcode in FLOATING_POINT_R_WITH_FUNCT3_DEST_X_INSTRUCTIONS:
+        print("Error: illegal operands at line %s" % p.lineno(1))
+    has_funct3 = opcode in FLOATING_POINT_R_WITH_FUNCT3_INSTRUCTIONS
+    rm_funct3 = FLOATING_POINT_R_FUNCT3[opcode] if has_funct3 else FLOATING_POINT_ROUNDING_MODES['dyn']
     p[0] = {
         'type': 'floating_point_r_instruction',
         'opcode': p[1],
         'rd': get_f_register_index(p[2]),
         'rs1': get_f_register_index(p[4]),
         'rs2': get_f_register_index(p[6]),
-        'rm': FLOATING_POINT_ROUNDING_MODES['dyn'],
+        'rm_funct3': rm_funct3,
         'lineno': p.lineno(1)
     }
 
@@ -226,7 +231,20 @@ def p_expression_floating_point_r_with_rm_instruction(p):
         'rd': get_f_register_index(p[2]),
         'rs1': get_f_register_index(p[4]),
         'rs2': get_f_register_index(p[6]),
-        'rm': FLOATING_POINT_ROUNDING_MODES[p[8]],
+        'rm_funct3': FLOATING_POINT_ROUNDING_MODES[p[8]],
+        'lineno': p.lineno(1)
+    }
+
+
+def p_expression_floating_point_r_destination_x_instruction(p):
+    """expression : ID register COMMA f_register COMMA f_register NEWLINE"""
+    p[0] = {
+        'type': 'floating_point_r_instruction',
+        'opcode': p[1],
+        'rd': get_x_register_index(p[2]),
+        'rs1': get_f_register_index(p[4]),
+        'rs2': get_f_register_index(p[6]),
+        'rm_funct3': FLOATING_POINT_R_FUNCT3[p[1]],
         'lineno': p.lineno(1)
     }
 

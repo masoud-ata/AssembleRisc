@@ -205,9 +205,9 @@ class AssembleRisc:
         rd_bits = get_register_index_binary(instruction['rd'])
         rs1_bits = get_register_index_binary(instruction['rs1'])
         rs2_bits = get_register_index_binary(instruction['rs2'])
-        rm_bits = instruction['rm']
+        rm_funct3_bits = instruction['rm_funct3']
         funct7_bits = FLOATING_POINT_R_FUNCT7[instruction['opcode']]
-        return funct7_bits + rs2_bits + rs1_bits + rm_bits + rd_bits + opcode_bits
+        return funct7_bits + rs2_bits + rs1_bits + rm_funct3_bits + rd_bits + opcode_bits
 
     def find_labels_pass(self) -> None:
         self.instruction_address = 0

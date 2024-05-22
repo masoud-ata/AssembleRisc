@@ -36,8 +36,8 @@ def t_REGISTER(token):
 
 
 def t_F_REGISTER(token):
-    r'f3[0-1]|f2[0-9]|f1[0-9]|f[0-9]' \
-    '|ft3[0-1]|ft2[0-9]|ft1[0-9]|ft[0-9]'
+    r'ft1[0-1]|ft[0-9]|fs1[0-1]|fs[0-9]|fa[0-7]'\
+    r'|f3[0-1]|f2[0-9]|f1[0-9]|f[0-9]'
     token.type = "F_REGISTER"
     return token
 

@@ -76,8 +76,8 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 ### RV32F
 | Instruction | Format | Supported | Instruction | Format | Supported | 
 |:-----------:|:------:|:---------:|:-----------:|:------:|:---------:|
-|   fadd.s    |   R    |  &check;  |    
-|   fsub.s    |   R    |  &check;  |    
-|   fmul.s    |   R    |  &check;  |    
+|   fadd.s    |   R    |  &check;  |    feq.s    |   R    |  &check;  |
+|   fsub.s    |   R    |  &check;  |    flt.s    |   R    |  &check;  |    
+|   fmul.s    |   R    |  &check;  |    fle.s    |   R    |  &check;  |    
 |   fdiv.s    |   R    |  &check;  |   
 
