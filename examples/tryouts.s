@@ -9,3 +9,6 @@ fsqrt.s f30, f4, rup
 fsqrt.s f30, f4, rmm
 fsqrt.s f30, f4, rdn
 fsqrt.s f30, f4
+fmv.x.w x29, f31
+fmv.w.x f29, x31
+fmv.w.x f0, x0

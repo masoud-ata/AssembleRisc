@@ -209,6 +209,7 @@ def p_expression_floating_point_r_instruction(p):
         print("Error: illegal operands at line %s" % p.lineno(1))
     has_funct3 = opcode in FLOATING_POINT_R_WITH_FUNCT3_INSTRUCTIONS
     rm_funct3 = FLOATING_POINT_R_FUNCT3[opcode] if has_funct3 else FLOATING_POINT_ROUNDING_MODES['dyn']
+
     p[0] = {
         'type': 'floating_point_r_instruction',
         'opcode': p[1],
@@ -225,6 +226,7 @@ def p_expression_floating_point_r_with_rm_instruction(p):
     rm = p[8]
     if rm not in FLOATING_POINT_ROUNDING_MODES:
         print("Error: illegal operands at line %s" % p.lineno(1))
+
     p[0] = {
         'type': 'floating_point_r_instruction',
         'opcode': p[1],
@@ -267,6 +269,7 @@ def p_expression_floating_point_r_2_reg_with_rm_instruction(p):
     rm = p[6]
     if rm not in FLOATING_POINT_ROUNDING_MODES:
         print("Error: illegal operands at line %s" % p.lineno(1))
+
     p[0] = {
         'type': 'floating_point_r_instruction',
         'opcode': p[1],
@@ -274,6 +277,38 @@ def p_expression_floating_point_r_2_reg_with_rm_instruction(p):
         'rs1': get_f_register_index(p[4]),
         'rs2': '0',
         'rm_funct3': FLOATING_POINT_ROUNDING_MODES[p[6]],
+        'lineno': p.lineno(1)
+    }
+
+
+def p_expression_floating_point_r_moveto_x_instruction(p):
+    """expression : ID register COMMA f_register NEWLINE"""
+    if p[1] != INSTRUCTION_FMV_X_W:
+        print("Error: Incorrect or unrocognized instruction at line %s" % p.lineno(1))
+
+    p[0] = {
+        'type': 'floating_point_r_instruction',
+        'opcode': p[1],
+        'rd': get_x_register_index(p[2]),
+        'rs1': get_f_register_index(p[4]),
+        'rs2': '0',
+        'rm_funct3': '000',
+        'lineno': p.lineno(1)
+    }
+
+
+def p_expression_floating_point_r_moveto_f_instruction(p):
+    """expression : ID f_register COMMA register NEWLINE"""
+    if p[1] != INSTRUCTION_FMV_W_X:
+        print("Error: Incorrect or unrocognized instruction at line %s" % p.lineno(1))
+
+    p[0] = {
+        'type': 'floating_point_r_instruction',
+        'opcode': p[1],
+        'rd': get_f_register_index(p[2]),
+        'rs1': get_x_register_index(p[4]),
+        'rs2': '0',
+        'rm_funct3': '000',
         'lineno': p.lineno(1)
     }
 
