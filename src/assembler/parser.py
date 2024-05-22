@@ -12,7 +12,7 @@ def to_int(field: str) -> int:
         return int(field)
 
 
-def p_expression_nop(p):
+def p_expression_no_argument(p):
     """expression : ID NEWLINE"""
     if p[1] == 'nop':
         p[0] = {
@@ -20,6 +20,15 @@ def p_expression_nop(p):
             'opcode': 'addi',
             'rd': get_x_register_index('x0'),
             'rs1': get_x_register_index('x0'),
+            'imm': 0,
+            'lineno': p.lineno(1)
+        }
+    elif p[1] == 'ret':
+        p[0] = {
+            'type': 'jalr_instruction',
+            'opcode': p[1],
+            'rd': get_x_register_index('x0'),
+            'rs1': get_x_register_index('x1'),
             'imm': 0,
             'lineno': p.lineno(1)
         }

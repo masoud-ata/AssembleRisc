@@ -4,9 +4,9 @@ from assembler.assemblerisc import AssembleRisc
 
 
 def get_args() -> str:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input", help="Input assembly file name.")
-    args = parser.parse_args()
+    argument_parser = argparse.ArgumentParser()
+    argument_parser.add_argument("-i", "--input", help="Input assembly file name.")
+    args = argument_parser.parse_args()
     input_file = args.input if args.input else '../examples/tryouts.s'
     return input_file
 
