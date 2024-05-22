@@ -26,3 +26,7 @@ div x21, x13, x15
 divu x21, x13, x15
 rem x21, x13, x15
 remu x20, x30, x29
+fadd.s f31, f22, f13, rne
+fsub.s f31, f22, f13, rtz
+fmul.s f31, f22, f13
+fdiv.s f0, f11, ft25, rup

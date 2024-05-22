@@ -2,7 +2,7 @@ import ply.yacc as yacc
 
 from assembler.tokenizer import tokens
 from assembler.instruction_info import *
-from assembler.pre_process import get_x_register_index
+from assembler.pre_process import get_x_register_index, get_f_register_index
 
 
 def to_int(field: str) -> int:
@@ -202,9 +202,46 @@ def p_expression_compressed_j_r_instruction(p):
     }
 
 
+def p_expression_floating_point_r_instruction(p):
+    """expression : ID f_register COMMA f_register COMMA f_register NEWLINE"""
+    p[0] = {
+        'type': 'floating_point_r_instruction',
+        'opcode': p[1],
+        'rd': get_f_register_index(p[2]),
+        'rs1': get_f_register_index(p[4]),
+        'rs2': get_f_register_index(p[6]),
+        'rm': FLOATING_POINT_ROUNDING_MODES['dyn'],
+        'lineno': p.lineno(1)
+    }
+
+
+def p_expression_floating_point_r_with_rm_instruction(p):
+    """expression : ID f_register COMMA f_register COMMA f_register COMMA ID NEWLINE"""
+    rm = p[8]
+    if rm not in FLOATING_POINT_ROUNDING_MODES:
+        print("Error: illegal operands at line %s" % p.lineno(1))
+    p[0] = {
+        'type': 'floating_point_r_instruction',
+        'opcode': p[1],
+        'rd': get_f_register_index(p[2]),
+        'rs1': get_f_register_index(p[4]),
+        'rs2': get_f_register_index(p[6]),
+        'rm': FLOATING_POINT_ROUNDING_MODES[p[8]],
+        'lineno': p.lineno(1)
+    }
+
+
 def p_register(p):
     """register : REGISTER"""
     reg_number = int(get_x_register_index(p[1]))
+    if (reg_number < 0) or (reg_number > 31):
+        print("Error at line " + str(p.lineno(1)) + ": Invalid register index.")
+    p[0] = p[1]
+
+
+def p_floating_point_register(p):
+    """f_register : F_REGISTER"""
+    reg_number = int(get_f_register_index(p[1]))
     if (reg_number < 0) or (reg_number > 31):
         print("Error at line " + str(p.lineno(1)) + ": Invalid register index.")
     p[0] = p[1]

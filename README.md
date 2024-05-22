@@ -73,3 +73,11 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |   mulhsu    |   R    |  &check;  |     rem     |   R    |  &check;  |
 |    mulhu    |   R    |  &check;  |    remu     |   R    |  &check;  |
 
+### RV32F
+| Instruction | Format | Supported | Instruction | Format | Supported | 
+|:-----------:|:------:|:---------:|:-----------:|:------:|:---------:|
+|   fadd.s    |   R    |  &check;  |    
+|   fsub.s    |   R    |  &check;  |    
+|   fmul.s    |   R    |  &check;  |    
+|   fdiv.s    |   R    |  &check;  |   
+

@@ -8,6 +8,7 @@ tokens = (
     'RIGHT_PAREN',
     'LABEL_COLON',
     'REGISTER',
+    'F_REGISTER',
     'COMPRESSED_ID',
     'ID',
     'NEWLINE'
@@ -21,7 +22,7 @@ t_RIGHT_PAREN = r'\)'
 
 
 def t_LABEL_COLON(token):
-    r'[a-zA-Z_][a-zA-Z_0-9]*[:]'
+    r'[a-zA-Z_][a-zA-Z_0-9\.]*[:]'
     token.type = "LABEL_COLON"
     return token
 
@@ -34,6 +35,13 @@ def t_REGISTER(token):
     return token
 
 
+def t_F_REGISTER(token):
+    r'f3[0-1]|f2[0-9]|f1[0-9]|f[0-9]' \
+    '|ft3[0-1]|ft2[0-9]|ft1[0-9]|ft[0-9]'
+    token.type = "F_REGISTER"
+    return token
+
+
 def t_COMPRESSED_ID(token):
     r'c\.[a-z]+'
     token.type = "COMPRESSED_ID"
@@ -41,7 +49,7 @@ def t_COMPRESSED_ID(token):
 
 
 def t_ID(token):
-    r'[a-zA-Z_][a-zA-Z_0-9]*'
+    r'[a-zA-Z_][a-zA-Z_0-9\.]*'
     token.type = "ID"
     return token
 
