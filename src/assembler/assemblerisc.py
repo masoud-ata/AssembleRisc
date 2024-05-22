@@ -231,7 +231,7 @@ class AssembleRisc:
     def assemble(self, filename) -> str:
         try:
             with open(filename) as file:
-                self.assembly_sequence = file.read()
+                self.assembly_sequence = file.read() + "\n"
                 self.find_labels_pass()
                 binary_code = self.parse_instructions_pass()
                 return binary_code
