@@ -198,10 +198,11 @@ class AssembleRisc:
 
     def _decode_compressed_j_r_instruction(self) -> str:
         instruction = self.parse_info
-        opcode_bits = '10'
         if int(instruction['rs1']) == 0:
             error_message = 'Error: illegal operands at line {}'.format(str(instruction['lineno']))
             raise Exception(error_message)
+
+        opcode_bits = '10'
         rs1_bits = get_register_index_binary(instruction['rs1'])
         funct4_bits = COMPRESSED_J_R_FUNCT4[instruction['opcode']]
         return funct4_bits + rs1_bits + '00000' + opcode_bits

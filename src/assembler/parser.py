@@ -204,6 +204,9 @@ def p_expression_compressed_j_instruction(p):
 
 def p_expression_compressed_j_r_instruction(p):
     """expression : COMPRESSED_ID register NEWLINE"""
+    if p[1] not in COMPRESSED_J_R_INSTRUCTIONS:
+        error_message = 'Error: illegal or incomplete instruction at line {}'.format(p.lineno(1))
+        raise Exception(error_message)
     p[0] = {
         'type': 'compressed_j_r_instruction',
         'opcode': p[1],
