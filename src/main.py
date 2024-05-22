@@ -28,15 +28,25 @@ def _convert_to_hex(binary_code) -> str:
     return hex_result
 
 
+def _dump_bytes(hex_code) -> str:
+    hex_result = ""
+    codes = hex_code.splitlines()
+    for code in codes:
+        hex_result += code[::-1]
+    return hex_result
+
+
 def main():
     input_filename = get_args()
 
     assembler = AssembleRisc()
     binary_code = assembler.assemble(input_filename)
     hex_code = _convert_to_hex(binary_code)
+    hex_byte_dump = _dump_bytes(hex_code)
 
     write_output_file('../output/out_binary.txt', binary_code)
     write_output_file('../output/out_hexadeciaml.txt', hex_code)
+    write_output_file('../output/out_byte_dump_hexadeciaml.txt', hex_byte_dump)
 
 
 if __name__ == "__main__":

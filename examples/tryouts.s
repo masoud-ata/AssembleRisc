@@ -1,5 +1,6 @@
 fadd.s	ft11,fs6,fa3,rne
 fsub.s	ft11,fs6,fa3,rtz
+c.mv x8, x8
 fmul.s	ft11,fs6,fa3
 fdiv.s	ft0,fa1,fs9,rup
 feq.s	a1,fa2,fa3
