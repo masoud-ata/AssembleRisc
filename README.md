@@ -80,5 +80,5 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |   fsub.s    |   R    |  &check;  |    flt.s    |   R    |  &check;  |    
 |   fmul.s    |   R    |  &check;  |    fle.s    |   R    |  &check;  |    
 |   fdiv.s    |   R    |  &check;  |   fsqrt.s   |   R    |  &check;  | 
-|   fmv.x.w   |   R    |  &check;  | 
-|   fmv.w.x   |   R    |  &check;  | 
+|   fmv.x.w   |   R    |  &check;  |     flw     |   I    |  &check;  |   
+|   fmv.w.x   |   R    |  &check;  |     fsw     |   S    |  &check;  | 

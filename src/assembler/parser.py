@@ -313,6 +313,31 @@ def p_expression_floating_point_r_moveto_f_instruction(p):
     }
 
 
+def p_expression_floating_point_load_instruction(p):
+    """expression : ID f_register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
+    if p[1] not in FLOATING_POINT_LOAD_STORE_INSTRUCTIONS:
+        print("Error: Incorrect or unrocognized instruction at line %s" % p.lineno(1))
+
+    if p[1] == INSTRUCTION_FLW:
+        p[0] = {
+            'type': 'i_load_instruction',
+            'opcode': p[1],
+            'rd': get_f_register_index(p[2]),
+            'rs1': get_x_register_index(p[6]),
+            'imm': to_int(p[4]),
+            'lineno': p.lineno(1)
+        }
+    elif p[1] == INSTRUCTION_FSW:
+        p[0] = {
+            'type': 's_instruction',
+            'opcode': p[1],
+            'rs2': get_f_register_index(p[2]),
+            'rs1': get_x_register_index(p[6]),
+            'imm': to_int(p[4]),
+            'lineno': p.lineno(1)
+        }
+
+
 def p_register(p):
     """register : REGISTER"""
     reg_number = int(get_x_register_index(p[1]))

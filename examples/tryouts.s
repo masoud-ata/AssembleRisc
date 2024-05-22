@@ -12,3 +12,10 @@ fsqrt.s f30, f4
 fmv.x.w x29, f31
 fmv.w.x f29, x31
 fmv.w.x f0, x0
+lb x4, 0(x12)
+lh x4, 0(x12)
+lw x4, 0(x12)
+flw f4, 0(x12)
+fsw f4, 0(x12)
+fsw f30, 0(t4)
+fsw fa7, 0(a7)
