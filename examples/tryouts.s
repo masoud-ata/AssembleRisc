@@ -15,4 +15,7 @@ c.j -2048
 c.jal 1022
 c.jr x17
 c.jalr x29
+nop
+nop
+addi x0, x0, 0
 

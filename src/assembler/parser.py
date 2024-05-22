@@ -12,6 +12,21 @@ def to_int(field: str) -> int:
         return int(field)
 
 
+def p_expression_nop(p):
+    """expression : ID NEWLINE"""
+    if p[1] == 'nop':
+        p[0] = {
+            'type': 'i_instruction',
+            'opcode': 'addi',
+            'rd': get_x_register_index('x0'),
+            'rs1': get_x_register_index('x0'),
+            'imm': 0,
+            'lineno': p.lineno(1)
+        }
+    else:
+        print("Unrecognized instruction at line %s" % p.lineno(1))
+
+
 def p_expression_label(p):
     """expression : LABEL_COLON NEWLINE"""
     p[0] = {
@@ -33,7 +48,7 @@ def p_expression_r_instruction(p):
     }
 
 
-def p_statement_i_instruction(p):
+def p_expression_i_instruction(p):
     """expression : ID register COMMA register COMMA IMMEDIATE NEWLINE"""
     instruction = 'i_shift_instruction' if p[1] in I_SHIFT_INSTRUCTIONS else 'i_instruction'
     p[0] = {
@@ -46,7 +61,7 @@ def p_statement_i_instruction(p):
     }
 
 
-def p_statement_iload_s_jalr_instruction(p):
+def p_expression_iload_s_jalr_instruction(p):
     """expression : ID register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
     if p[1] == INSTRUCTION_JALR:
         p[0] = {
@@ -77,7 +92,7 @@ def p_statement_iload_s_jalr_instruction(p):
         }
 
 
-def p_statement_u_instruction(p):
+def p_expression_u_instruction(p):
     """expression : ID register COMMA IMMEDIATE NEWLINE"""
     instruction = 'jal_instruction' if p[1] == INSTRUCTION_JAL else 'u_instruction'
     p[0] = {
