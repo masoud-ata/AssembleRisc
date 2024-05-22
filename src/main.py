@@ -37,16 +37,19 @@ def _dump_bytes(hex_code) -> str:
 
 
 def main():
-    input_filename = get_args()
+    try:
+        input_filename = get_args()
+        assembler = AssembleRisc()
+        binary_code = assembler.assemble(input_filename)
 
-    assembler = AssembleRisc()
-    binary_code = assembler.assemble(input_filename)
-    hex_code = _convert_to_hex(binary_code)
-    hex_byte_dump = _dump_bytes(hex_code)
+        hex_code = _convert_to_hex(binary_code)
+        hex_byte_dump = _dump_bytes(hex_code)
 
-    write_output_file('../output/out_binary.txt', binary_code)
-    write_output_file('../output/out_hexadeciaml.txt', hex_code)
-    write_output_file('../output/out_byte_dump_hexadeciaml.txt', hex_byte_dump)
+        write_output_file('../output/out_binary.txt', binary_code)
+        write_output_file('../output/out_hexadeciaml.txt', hex_code)
+        write_output_file('../output/out_byte_dump_hexadeciaml.txt', hex_byte_dump)
+    except Exception as e:
+        print(str(e))
 
 
 if __name__ == "__main__":

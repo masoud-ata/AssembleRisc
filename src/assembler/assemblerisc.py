@@ -117,7 +117,8 @@ class AssembleRisc:
         if instruction['opcode'] in [INSTRUCTION_C_ADD, INSTRUCTION_C_MV]:
             opcode_bits = '10'
             if int(instruction['rd']) == 0 or int(instruction['rs2']) == 0:
-                print("Illegal operands @ line " + str(instruction['lineno']))
+                error_message = 'Error: illegal operands at line {}'.format(str(instruction['lineno']))
+                raise Exception(error_message)
             rd_bits = get_register_index_binary(instruction['rd'])
             rs2_bits = get_register_index_binary(instruction['rs2'])
             func_bit = COMPRESSED_R_FUNCT[instruction['opcode']]
@@ -127,7 +128,8 @@ class AssembleRisc:
                     int(instruction['rd']) < 8 or int(instruction['rd']) > 15 or
                     int(instruction['rs2']) < 8 or int(instruction['rs2']) > 15
             ):
-                print("Illegal operands @ line " + str(instruction['lineno']))
+                error_message = 'Error: illegal operands at line {}'.format(str(instruction['lineno']))
+                raise Exception(error_message)
             rd_bits = get_compressed_register_index_binary(instruction['rd'])
             rs2_bits = get_compressed_register_index_binary(instruction['rs2'])
             funct_bits = COMPRESSED_R_FUNCT[instruction['opcode']]
@@ -138,14 +140,16 @@ class AssembleRisc:
         opcode_bits = COMPRESSED_I_OPCODE[instruction['opcode']]
         if instruction['opcode'] in [INSTRUCTION_C_ADDI, INSTRUCTION_C_LI, INSTRUCTION_C_LUI, INSTRUCTION_C_SLLI]:
             if instruction['opcode'] == INSTRUCTION_C_LUI and int(instruction['rd']) == 2:
-                print("Illegal operands @ line " + str(instruction['lineno']))
+                error_message = 'Error: illegal operands at line {}'.format(str(instruction['lineno']))
+                raise Exception(error_message)
             rd_bits = get_register_index_binary(instruction['rd'])
             imm_bits = get_immediate_binary_6(instruction['imm'])
             funct3_bits = COMPRESSED_I_FUNCT3[instruction['opcode']]
             return funct3_bits + imm_bits[0] + rd_bits + imm_bits[1:6] + opcode_bits
         else:
             if int(instruction['rd']) < 8 or int(instruction['rd']) > 15:
-                print("Illegal operands @ line " + str(instruction['lineno']))
+                error_message = 'Error: illegal operands at line {}'.format(str(instruction['lineno']))
+                raise Exception(error_message)
             rd_bits = get_compressed_register_index_binary(instruction['rd'])
             imm_bits = get_immediate_binary_6(instruction['imm'])
             funct2_bits = COMPRESSED_I_FUNCT2[instruction['opcode']]
@@ -168,7 +172,8 @@ class AssembleRisc:
         rs1_bits = get_compressed_register_index_binary(instruction['rs1'])
         funct3_bits = COMPRESSED_L_FUNCT3[instruction['opcode']]
         if int(instruction['imm']) % 4 != 0:
-            print("Illegal operands @ line " + str(instruction['lineno']))
+            error_message = 'Error: illegal immediate operand at line {}'.format(str(instruction['lineno']))
+            raise Exception(error_message)
         imm_bits_5to3, imm_bits_2_6 = get_immediate_binary_5_compressed_l(instruction['imm'])
         return funct3_bits + imm_bits_5to3 + rs1_bits + imm_bits_2_6 + rd_bits + opcode_bits
 
@@ -179,7 +184,8 @@ class AssembleRisc:
         rs1_bits = get_compressed_register_index_binary(instruction['rs1'])
         funct3_bits = COMPRESSED_L_FUNCT3[instruction['opcode']]
         if int(instruction['imm']) % 4 != 0:
-            print("Illegal operands @ line " + str(instruction['lineno']))
+            error_message = 'Error: illegal immediate operand at line {}'.format(str(instruction['lineno']))
+            raise Exception(error_message)
         imm_bits_5to3, imm_bits_2_6 = get_immediate_binary_5_compressed_l(instruction['imm'])
         return funct3_bits + imm_bits_5to3 + rs1_bits + imm_bits_2_6 + rs2_bits + opcode_bits
 
@@ -194,7 +200,8 @@ class AssembleRisc:
         instruction = self.parse_info
         opcode_bits = '10'
         if int(instruction['rs1']) == 0:
-            print("Illegal operands @ line " + str(instruction['lineno']))
+            error_message = 'Error: illegal operands at line {}'.format(str(instruction['lineno']))
+            raise Exception(error_message)
         rs1_bits = get_register_index_binary(instruction['rs1'])
         funct4_bits = COMPRESSED_J_R_FUNCT4[instruction['opcode']]
         return funct4_bits + rs1_bits + '00000' + opcode_bits
@@ -247,5 +254,5 @@ class AssembleRisc:
                 binary_code = self.parse_instructions_pass()
                 return binary_code
         except IOError:
-            print("File not found: %s" % filename)
-            return ""
+            error_message = 'Error: file {} not found'.format(filename)
+            raise Exception(error_message)

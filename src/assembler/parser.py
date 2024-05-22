@@ -33,7 +33,8 @@ def p_expression_no_argument(p):
             'lineno': p.lineno(1)
         }
     else:
-        print("Unrecognized instruction at line %s" % p.lineno(1))
+        error_message = 'Error: unrecognized instruction at line {}'.format(p.lineno(1))
+        raise Exception(error_message)
 
 
 def p_expression_label(p):
@@ -215,7 +216,8 @@ def p_expression_floating_point_r_instruction(p):
     """expression : ID f_register COMMA f_register COMMA f_register NEWLINE"""
     opcode = p[1]
     if opcode in FLOATING_POINT_R_WITH_FUNCT3_DEST_X_INSTRUCTIONS:
-        print("Error: illegal operands at line %s" % p.lineno(1))
+        error_message = 'Error: illegal operands at line {}'.format(p.lineno(1))
+        raise Exception(error_message)
     has_funct3 = opcode in FLOATING_POINT_R_WITH_FUNCT3_INSTRUCTIONS
     rm_funct3 = FLOATING_POINT_R_FUNCT3[opcode] if has_funct3 else FLOATING_POINT_ROUNDING_MODES['dyn']
 
@@ -234,7 +236,8 @@ def p_expression_floating_point_r_with_rm_instruction(p):
     """expression : ID f_register COMMA f_register COMMA f_register COMMA ID NEWLINE"""
     rm = p[8]
     if rm not in FLOATING_POINT_ROUNDING_MODES:
-        print("Error: illegal operands at line %s" % p.lineno(1))
+        error_message = 'Error: illegal rounding mode at line {}'.format(p.lineno(1))
+        raise Exception(error_message)
 
     p[0] = {
         'type': 'floating_point_r_instruction',
@@ -277,7 +280,8 @@ def p_expression_floating_point_r_2_reg_with_rm_instruction(p):
     """expression : ID f_register COMMA f_register COMMA ID NEWLINE"""
     rm = p[6]
     if rm not in FLOATING_POINT_ROUNDING_MODES:
-        print("Error: illegal operands at line %s" % p.lineno(1))
+        error_message = 'Error: illegal rounding mode at line {}'.format(p.lineno(1))
+        raise Exception(error_message)
 
     p[0] = {
         'type': 'floating_point_r_instruction',
@@ -293,7 +297,8 @@ def p_expression_floating_point_r_2_reg_with_rm_instruction(p):
 def p_expression_floating_point_r_moveto_x_instruction(p):
     """expression : ID register COMMA f_register NEWLINE"""
     if p[1] != INSTRUCTION_FMV_X_W:
-        print("Error: Incorrect or unrocognized instruction at line %s" % p.lineno(1))
+        error_message = 'Error: incorrect or unrocognized instruction at line {}'.format(p.lineno(1))
+        raise Exception(error_message)
 
     p[0] = {
         'type': 'floating_point_r_instruction',
@@ -309,7 +314,8 @@ def p_expression_floating_point_r_moveto_x_instruction(p):
 def p_expression_floating_point_r_moveto_f_instruction(p):
     """expression : ID f_register COMMA register NEWLINE"""
     if p[1] != INSTRUCTION_FMV_W_X:
-        print("Error: Incorrect or unrocognized instruction at line %s" % p.lineno(1))
+        error_message = 'Error: incorrect or unrocognized instruction at line {}'.format(p.lineno(1))
+        raise Exception(error_message)
 
     p[0] = {
         'type': 'floating_point_r_instruction',
@@ -325,7 +331,8 @@ def p_expression_floating_point_r_moveto_f_instruction(p):
 def p_expression_floating_point_load_instruction(p):
     """expression : ID f_register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
     if p[1] not in FLOATING_POINT_LOAD_STORE_INSTRUCTIONS:
-        print("Error: Incorrect or unrocognized instruction at line %s" % p.lineno(1))
+        error_message = 'Error: incorrect or unrocognized instruction at line {}'.format(p.lineno(1))
+        raise Exception(error_message)
 
     if p[1] == INSTRUCTION_FLW:
         p[0] = {
@@ -350,16 +357,12 @@ def p_expression_floating_point_load_instruction(p):
 def p_register(p):
     """register : REGISTER"""
     reg_number = int(get_x_register_index(p[1]))
-    if (reg_number < 0) or (reg_number > 31):
-        print("Error at line " + str(p.lineno(1)) + ": Invalid register index.")
     p[0] = p[1]
 
 
 def p_floating_point_register(p):
     """f_register : F_REGISTER"""
     reg_number = int(get_f_register_index(p[1]))
-    if (reg_number < 0) or (reg_number > 31):
-        print("Error at line " + str(p.lineno(1)) + ": Invalid register index.")
     p[0] = p[1]
 
 
@@ -373,10 +376,11 @@ def p_statement_newline(p):
 
 def p_error(p):
     if p:
-        line_number = str(p.lineno)
-        print("Error at line " + line_number + ": Invalid or incomplete token" + " found '" + str(p.value) + "'")
+        error_message = 'Error: invalid or incomplete token "{}" found at line {}'.format(str(p.value), str(p.lineno))
+        raise Exception(error_message)
     else:
-        print("Error: Invalid or incomplete token found " + "Did you end with a newline?")
+        error_message = 'Error'
+        raise Exception(error_message)
 
 
 parser = yacc.yacc()

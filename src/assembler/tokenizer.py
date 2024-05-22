@@ -69,8 +69,9 @@ def t_COMMENT(token):
 
 
 def t_error(token):
-    print("Illegal character '%s'" % token.value[0])
     token.lexer.skip(1)
+    error_message = 'Error: illegal character "{}" at line {}'.format(token.value[0], token.lexer.lineno)
+    raise Exception(error_message)
 
 
 lexer = lex.lex()
