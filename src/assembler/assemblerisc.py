@@ -97,8 +97,11 @@ class AssembleRisc:
         rs1_bits = get_register_index_binary(instruction['rs1'])
         rs2_bits = get_register_index_binary(instruction['rs2'])
         funct3_bits = B_FUNCT3[instruction['opcode']]
-        target_address = self.labels_table[instruction['label']]
-        imm_value = (target_address - self.instruction_address) // 2
+        if 'imm' in instruction:
+            imm_value = instruction['imm'] // 2
+        else:
+            target_address = self.labels_table[instruction['label']]
+            imm_value = (target_address - self.instruction_address) // 2
         imm_bits_12_10to5, imm_bits_4to1_11 = get_immediate_binary_12b(imm_value)
         return imm_bits_12_10to5 + rs2_bits + rs1_bits + funct3_bits + imm_bits_4to1_11 + opcode_bits
 
@@ -160,8 +163,11 @@ class AssembleRisc:
         opcode_bits = '01'
         rs1_bits = get_compressed_register_index_binary(instruction['rs1'])
         funct3_bits = COMPRESSED_B_FUNCT3[instruction['opcode']]
-        target_address = self.labels_table[instruction['label']]
-        imm_value = (target_address - self.instruction_address) // 2
+        if 'imm' in instruction:
+            imm_value = instruction['imm'] // 2
+        else:
+            target_address = self.labels_table[instruction['label']]
+            imm_value = (target_address - self.instruction_address) // 2
         imm_bits_8_4to3, imm_bits_7to6_2to1_5 = get_immediate_binary_8_compressed_b(imm_value)
         return funct3_bits + imm_bits_8_4to3 + rs1_bits + imm_bits_7to6_2to1_5 + opcode_bits
 

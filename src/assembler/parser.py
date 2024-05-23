@@ -12,7 +12,7 @@ def to_int(field: str) -> int:
         return int(field)
 
 
-def p_expression_no_argument(p):
+def p_instruction_no_args(p):
     """expression : ID NEWLINE"""
     if p[1] == 'nop':
         p[0] = {
@@ -26,18 +26,18 @@ def p_expression_no_argument(p):
     elif p[1] == 'ret':
         p[0] = {
             'type': 'jalr_instruction',
-            'opcode': p[1],
+            'opcode': 'jalr',
             'rd': get_x_register_index('x0'),
             'rs1': get_x_register_index('x1'),
             'imm': 0,
             'lineno': p.lineno(1)
         }
     else:
-        error_message = 'Error: unrecognized instruction at line {}'.format(p.lineno(1))
+        error_message = f'Error: unrecognized instruction at line {p.lineno(1)}'
         raise Exception(error_message)
 
 
-def p_expression_label(p):
+def p_label(p):
     """expression : LABEL_COLON NEWLINE"""
     p[0] = {
         'type': 'label',
@@ -46,7 +46,7 @@ def p_expression_label(p):
     }
 
 
-def p_expression_r_instruction(p):
+def p_instruction_xreg_xreg_xreg(p):
     """expression : ID register COMMA register COMMA register NEWLINE"""
     p[0] = {
         'type': 'r_instruction',
@@ -58,20 +58,30 @@ def p_expression_r_instruction(p):
     }
 
 
-def p_expression_i_instruction(p):
+def p_instruction_xreg_xreg_imm(p):
     """expression : ID register COMMA register COMMA IMMEDIATE NEWLINE"""
-    instruction = 'i_shift_instruction' if p[1] in I_SHIFT_INSTRUCTIONS else 'i_instruction'
-    p[0] = {
-        'type': instruction,
-        'opcode': p[1],
-        'rd': get_x_register_index(p[2]),
-        'rs1': get_x_register_index(p[4]),
-        'imm': to_int(p[6]),
-        'lineno': p.lineno(1)
-    }
+    if p[1] in B_INSTRUCTIONS:
+        p[0] = {
+            'type': 'b_instruction',
+            'opcode': p[1],
+            'rs1': get_x_register_index(p[2]),
+            'rs2': get_x_register_index(p[4]),
+            'imm': to_int(p[6]),
+            'lineno': p.lineno(1)
+        }
+    else:
+        instruction = 'i_shift_instruction' if p[1] in I_SHIFT_INSTRUCTIONS else 'i_instruction'
+        p[0] = {
+            'type': instruction,
+            'opcode': p[1],
+            'rd': get_x_register_index(p[2]),
+            'rs1': get_x_register_index(p[4]),
+            'imm': to_int(p[6]),
+            'lineno': p.lineno(1)
+        }
 
 
-def p_expression_iload_s_jalr_instruction(p):
+def p_instruction_xreg_imm_lparen_xreg_rparen(p):
     """expression : ID register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
     if p[1] == INSTRUCTION_JALR:
         p[0] = {
@@ -102,7 +112,7 @@ def p_expression_iload_s_jalr_instruction(p):
         }
 
 
-def p_expression_u_instruction(p):
+def p_instruction_xreg_imm(p):
     """expression : ID register COMMA IMMEDIATE NEWLINE"""
     instruction = 'jal_instruction' if p[1] == INSTRUCTION_JAL else 'u_instruction'
     p[0] = {
@@ -114,18 +124,7 @@ def p_expression_u_instruction(p):
     }
 
 
-def p_expression_jal_instruction(p):
-    """expression : ID register COMMA ID NEWLINE"""
-    p[0] = {
-        'type': 'jal_instruction',
-        'opcode': p[1],
-        'rd': get_x_register_index(p[2]),
-        'label': p[4],
-        'lineno': p.lineno(1)
-    }
-
-
-def p_expression_b_instruction(p):
+def p_instruction_xreg_xreg_id(p):
     """expression : ID register COMMA register COMMA ID NEWLINE"""
     p[0] = {
         'type': 'b_instruction',
@@ -137,7 +136,7 @@ def p_expression_b_instruction(p):
     }
 
 
-def p_expression_compressed_r_instruction(p):
+def p_compressed_instruction_xreg_xreg(p):
     """expression : COMPRESSED_ID register COMMA register NEWLINE"""
     p[0] = {
         'type': 'compressed_r_instruction',
@@ -148,19 +147,36 @@ def p_expression_compressed_r_instruction(p):
     }
 
 
-def p_expression_compressed_i_instruction(p):
+def p_compressed_instruction_xreg_imm(p):
     """expression : COMPRESSED_ID register COMMA IMMEDIATE NEWLINE"""
-    p[0] = {
-        'type': 'compressed_i_instruction',
-        'opcode': p[1],
-        'rd': get_x_register_index(p[2]),
-        'imm': to_int(p[4]),
-        'lineno': p.lineno(1)
-    }
+    if p[1] in COMPRESSED_B_INSTRUCTIONS:
+        x_reg_index = int(get_x_register_index(p[2]))
+        if x_reg_index < 8 or x_reg_index > 15:
+            error_message = f'Error: illegal operands at line {p.lineno(1)}'
+            raise Exception(error_message)
+        p[0] = {
+            'type': 'compressed_b_instruction',
+            'opcode': p[1],
+            'rs1': get_x_register_index(p[2]),
+            'imm': to_int(p[4]),
+            'lineno': p.lineno(1)
+        }
+    else:
+        p[0] = {
+            'type': 'compressed_i_instruction',
+            'opcode': p[1],
+            'rd': get_x_register_index(p[2]),
+            'imm': to_int(p[4]),
+            'lineno': p.lineno(1)
+        }
 
 
-def p_expression_compressed_b_instruction(p):
+def p_compressed_instruction_xreg_id(p):
     """expression : COMPRESSED_ID register COMMA ID NEWLINE"""
+    x_reg_index = int(get_x_register_index(p[2]))
+    if x_reg_index < 8 or x_reg_index > 15:
+        error_message = f'Error: illegal operands at line {p.lineno(1)}'
+        raise Exception(error_message)
     p[0] = {
         'type': 'compressed_b_instruction',
         'opcode': p[1],
@@ -170,7 +186,7 @@ def p_expression_compressed_b_instruction(p):
     }
 
 
-def p_statement_compressed_l_instruction(p):
+def p_compressed_instruction_xreg_imm_lparen_xreg_rparen(p):
     """expression : COMPRESSED_ID register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
     if p[1] == INSTRUCTION_C_LW:
         p[0] = {
@@ -192,7 +208,7 @@ def p_statement_compressed_l_instruction(p):
         }
 
 
-def p_expression_compressed_j_instruction(p):
+def p_compressed_instruction_imm(p):
     """expression : COMPRESSED_ID IMMEDIATE NEWLINE"""
     p[0] = {
         'type': 'compressed_j_instruction',
@@ -202,10 +218,10 @@ def p_expression_compressed_j_instruction(p):
     }
 
 
-def p_expression_compressed_j_r_instruction(p):
+def p_compressed_instruction_xreg(p):
     """expression : COMPRESSED_ID register NEWLINE"""
     if p[1] not in COMPRESSED_J_R_INSTRUCTIONS:
-        error_message = 'Error: illegal or incomplete instruction at line {}'.format(p.lineno(1))
+        error_message = f'Error: illegal or incomplete instruction at line {p.lineno(1)}'
         raise Exception(error_message)
     p[0] = {
         'type': 'compressed_j_r_instruction',
@@ -215,11 +231,11 @@ def p_expression_compressed_j_r_instruction(p):
     }
 
 
-def p_expression_floating_point_r_instruction(p):
+def p_floating_point_instruction_freg_freg_freg(p):
     """expression : ID f_register COMMA f_register COMMA f_register NEWLINE"""
     opcode = p[1]
     if opcode in FLOATING_POINT_R_WITH_FUNCT3_DEST_X_INSTRUCTIONS:
-        error_message = 'Error: illegal operands at line {}'.format(p.lineno(1))
+        error_message = f'Error: illegal operands at line {p.lineno(1)}'
         raise Exception(error_message)
     has_funct3 = opcode in FLOATING_POINT_R_WITH_FUNCT3_INSTRUCTIONS
     rm_funct3 = FLOATING_POINT_R_FUNCT3[opcode] if has_funct3 else FLOATING_POINT_ROUNDING_MODES['dyn']
@@ -235,11 +251,11 @@ def p_expression_floating_point_r_instruction(p):
     }
 
 
-def p_expression_floating_point_r_with_rm_instruction(p):
+def p_floating_point_instruction_freg_freg_freg_id(p):
     """expression : ID f_register COMMA f_register COMMA f_register COMMA ID NEWLINE"""
     rm = p[8]
     if rm not in FLOATING_POINT_ROUNDING_MODES:
-        error_message = 'Error: illegal rounding mode at line {}'.format(p.lineno(1))
+        error_message = f'Error: illegal rounding mode at line {p.lineno(1)}'
         raise Exception(error_message)
 
     p[0] = {
@@ -253,7 +269,7 @@ def p_expression_floating_point_r_with_rm_instruction(p):
     }
 
 
-def p_expression_floating_point_r_destination_x_instruction(p):
+def p_floating_point_instruction_xreg_freg_freg(p):
     """expression : ID register COMMA f_register COMMA f_register NEWLINE"""
     p[0] = {
         'type': 'floating_point_r_instruction',
@@ -266,7 +282,7 @@ def p_expression_floating_point_r_destination_x_instruction(p):
     }
 
 
-def p_expression_floating_point_r_2_reg_instruction(p):
+def p_floating_point_instruction_freg_freg(p):
     """expression : ID f_register COMMA f_register NEWLINE"""
     p[0] = {
         'type': 'floating_point_r_instruction',
@@ -279,11 +295,11 @@ def p_expression_floating_point_r_2_reg_instruction(p):
     }
 
 
-def p_expression_floating_point_r_2_reg_with_rm_instruction(p):
+def p_floating_point_instruction_freg_freg_id(p):
     """expression : ID f_register COMMA f_register COMMA ID NEWLINE"""
     rm = p[6]
     if rm not in FLOATING_POINT_ROUNDING_MODES:
-        error_message = 'Error: illegal rounding mode at line {}'.format(p.lineno(1))
+        error_message = f'Error: illegal rounding mode at line {p.lineno(1)}'
         raise Exception(error_message)
 
     p[0] = {
@@ -297,10 +313,10 @@ def p_expression_floating_point_r_2_reg_with_rm_instruction(p):
     }
 
 
-def p_expression_floating_point_r_moveto_x_instruction(p):
+def p_floating_point_instruction_xreg_freg(p):
     """expression : ID register COMMA f_register NEWLINE"""
     if p[1] != INSTRUCTION_FMV_X_W:
-        error_message = 'Error: incorrect or unrocognized instruction at line {}'.format(p.lineno(1))
+        error_message = f'Error: incorrect or unrocognized instruction at line {p.lineno(1)}'
         raise Exception(error_message)
 
     p[0] = {
@@ -314,10 +330,10 @@ def p_expression_floating_point_r_moveto_x_instruction(p):
     }
 
 
-def p_expression_floating_point_r_moveto_f_instruction(p):
+def p_floating_point_instruction_freg_xreg(p):
     """expression : ID f_register COMMA register NEWLINE"""
     if p[1] != INSTRUCTION_FMV_W_X:
-        error_message = 'Error: incorrect or unrocognized instruction at line {}'.format(p.lineno(1))
+        error_message = f'Error: incorrect or unrocognized instruction at line {p.lineno(1)}'
         raise Exception(error_message)
 
     p[0] = {
@@ -331,10 +347,10 @@ def p_expression_floating_point_r_moveto_f_instruction(p):
     }
 
 
-def p_expression_floating_point_load_instruction(p):
+def p_floating_point_instruction_freg_imm_lparen_xreg_rparen(p):
     """expression : ID f_register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
     if p[1] not in FLOATING_POINT_LOAD_STORE_INSTRUCTIONS:
-        error_message = 'Error: incorrect or unrocognized instruction at line {}'.format(p.lineno(1))
+        error_message = f'Error: incorrect or unrocognized instruction at line {p.lineno(1)}'
         raise Exception(error_message)
 
     if p[1] == INSTRUCTION_FLW:
@@ -357,19 +373,19 @@ def p_expression_floating_point_load_instruction(p):
         }
 
 
-def p_register(p):
+def p_xreg(p):
     """register : REGISTER"""
     reg_number = int(get_x_register_index(p[1]))
     p[0] = p[1]
 
 
-def p_floating_point_register(p):
+def p_freg(p):
     """f_register : F_REGISTER"""
     reg_number = int(get_f_register_index(p[1]))
     p[0] = p[1]
 
 
-def p_statement_newline(p):
+def p_newline(p):
     """expression : NEWLINE"""
     p[0] = {
         'type': 'new_line',
@@ -379,7 +395,7 @@ def p_statement_newline(p):
 
 def p_error(p):
     if p:
-        error_message = 'Error: invalid or incomplete token "{}" found at line {}'.format(str(p.value), str(p.lineno))
+        error_message = f'Error: invalid or incomplete token "{str(p.value)}" found at line {str(p.lineno)}'
         raise Exception(error_message)
     else:
         error_message = 'Error'

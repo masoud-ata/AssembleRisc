@@ -20,5 +20,8 @@ flw f4, 0(x12)
 fsw f4, 0(x12)
 fsw f30, 0(t4)
 fsw fa7, 0(a7)
+c.beqz x15, l
 ret
 jalr x0, 0(x1)
+c.beqz x15, 12
+l:
