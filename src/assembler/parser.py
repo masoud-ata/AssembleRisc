@@ -14,7 +14,16 @@ def to_int(field: str) -> int:
 
 def p_instruction_no_args(p):
     """expression : ID NEWLINE"""
-    if p[1] == 'nop':
+    if p[1] in [INSTRUCTION_EBREAK, INSTRUCTION_ECALL]:
+        p[0] = {
+            'type': 'i_instruction',
+            'opcode': p[1],
+            'rd': '0',
+            'rs1': '0',
+            'imm': 0 if p[1] == INSTRUCTION_ECALL else 1,
+            'lineno': p.lineno(1)
+        }
+    elif p[1] == 'nop':
         p[0] = {
             'type': 'i_instruction',
             'opcode': 'addi',

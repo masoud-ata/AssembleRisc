@@ -25,3 +25,5 @@ ret
 jalr x0, 0(x1)
 c.beqz x15, 12
 l:
+ebreak
+ecall

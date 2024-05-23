@@ -42,7 +42,7 @@ class AssembleRisc:
 
     def _decode_i_instruction(self) -> str:
         instruction = self.parse_info
-        opcode_bits = I_OPCODE
+        opcode_bits = I_OPCODE if instruction['opcode'] not in [INSTRUCTION_ECALL, INSTRUCTION_EBREAK] else I_SYSTEM_OPCODE
         rd_bits = get_register_index_binary(instruction['rd'])
         rs1_bits = get_register_index_binary(instruction['rs1'])
         funct3_bits = I_FUNCT3[instruction['opcode']]
