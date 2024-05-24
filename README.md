@@ -43,9 +43,9 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |    srli     |   I    |  &check;  |    csrrw    |   I    |  &check;  |  
 |    srai     |   I    |  &check;  |    csrrs    |   I    |  &check;  | 
 |     lb      |   I    |  &check;  |    csrrc    |   I    |  &check;  | 
-|     lh      |   I    |  &check;  |   csrrwi    |   I    |    | 
-|     lw      |   I    |  &check;  |   csrrsi    |   I    |    | 
-|     lbu     |   I    |  &check;  |   csrrci    |   I    |    | 
+|     lh      |   I    |  &check;  |   csrrwi    |   I    |  &check;  | 
+|     lw      |   I    |  &check;  |   csrrsi    |   I    |  &check;  | 
+|     lbu     |   I    |  &check;  |   csrrci    |   I    |  &check;  | 
 |     lhu     |   I    |  &check;  |   
 
 ### RV32C

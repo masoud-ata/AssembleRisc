@@ -106,6 +106,36 @@ def p_instruction_xreg_imm_xreg(p):
     }
 
 
+def p_instruction_xreg_imm_imm(p):
+    """expression : ID register COMMA IMMEDIATE COMMA IMMEDIATE NEWLINE"""
+    if p[1] not in I_CSRI_INSTRUCTIONS:
+        error_message = f'Error: illegal or incomplete instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+    p[0] = {
+        'type': 'i_instruction',
+        'opcode': p[1],
+        'rd': get_x_register_index(p[2]),
+        'rs1': str(to_int(p[6])),
+        'imm': to_int(p[4]),
+        'lineno': p.lineno(1)
+    }
+
+
+def p_instruction_xreg_id_imm(p):
+    """expression : ID register COMMA ID COMMA IMMEDIATE NEWLINE"""
+    if p[1] not in I_CSRI_INSTRUCTIONS:
+        error_message = f'Error: illegal or incomplete instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+    p[0] = {
+        'type': 'i_instruction',
+        'opcode': p[1],
+        'rd': get_x_register_index(p[2]),
+        'rs1': str(to_int(p[6])),
+        'imm': CSR_ENCODING_TABLE[p[4]],
+        'lineno': p.lineno(1)
+    }
+
+
 def p_instruction_xreg_id_xreg(p):
     """expression : ID register COMMA ID COMMA register NEWLINE"""
     if p[1] not in I_CSR_INSTRUCTIONS:

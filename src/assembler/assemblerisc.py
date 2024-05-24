@@ -42,7 +42,7 @@ class AssembleRisc:
 
     def _decode_i_instruction(self) -> str:
         instruction = self.parse_info
-        if instruction['opcode'] in I_ENVIRONMENT_INSTRUCTIONS + I_CSR_INSTRUCTIONS:
+        if instruction['opcode'] in I_ENVIRONMENT_INSTRUCTIONS + I_CSR_INSTRUCTIONS + I_CSRI_INSTRUCTIONS:
             opcode_bits = I_SYSTEM_OPCODE
         else:
             opcode_bits = I_OPCODE
