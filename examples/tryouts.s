@@ -27,3 +27,10 @@ c.beqz x15, 12
 l:
 ebreak
 ecall
+c.addi x8, 1
+c.addi x8, -1
+c.slli x8, 31
+csrrw x1, sstateen3, x2
+csrrw x1, 0x141, x2
+csrrc x1, mhpmevent3, x2
+csrrs x1, mhpmevent31, x2

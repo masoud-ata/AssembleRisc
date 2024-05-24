@@ -3,6 +3,7 @@ import ply.yacc as yacc
 from assembler.tokenizer import tokens
 from assembler.instruction_info import *
 from assembler.pre_process import get_x_register_index, get_f_register_index
+from assembler.csr_registers import CSR_ENCODING_TABLE
 
 
 def to_int(field: str) -> int:
@@ -14,7 +15,7 @@ def to_int(field: str) -> int:
 
 def p_instruction_no_args(p):
     """expression : ID NEWLINE"""
-    if p[1] in [INSTRUCTION_EBREAK, INSTRUCTION_ECALL]:
+    if p[1] in I_ENVIRONMENT_INSTRUCTIONS:
         p[0] = {
             'type': 'i_instruction',
             'opcode': p[1],
@@ -88,6 +89,39 @@ def p_instruction_xreg_xreg_imm(p):
             'imm': to_int(p[6]),
             'lineno': p.lineno(1)
         }
+
+
+def p_instruction_xreg_imm_xreg(p):
+    """expression : ID register COMMA IMMEDIATE COMMA register NEWLINE"""
+    if p[1] not in I_CSR_INSTRUCTIONS:
+        error_message = f'Error: illegal or incomplete instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+    p[0] = {
+        'type': 'i_instruction',
+        'opcode': p[1],
+        'rd': get_x_register_index(p[2]),
+        'rs1': get_x_register_index(p[6]),
+        'imm': to_int(p[4]),
+        'lineno': p.lineno(1)
+    }
+
+
+def p_instruction_xreg_id_xreg(p):
+    """expression : ID register COMMA ID COMMA register NEWLINE"""
+    if p[1] not in I_CSR_INSTRUCTIONS:
+        error_message = f'Error: illegal or incomplete instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+    if p[4] not in CSR_ENCODING_TABLE:
+        error_message = f'Error: unkown CSR {p[4]} at line {p.lineno(1)}'
+        raise Exception(error_message)
+    p[0] = {
+        'type': 'i_instruction',
+        'opcode': p[1],
+        'rd': get_x_register_index(p[2]),
+        'rs1': get_x_register_index(p[6]),
+        'imm': CSR_ENCODING_TABLE[p[4]],
+        'lineno': p.lineno(1)
+    }
 
 
 def p_instruction_xreg_imm_lparen_xreg_rparen(p):
