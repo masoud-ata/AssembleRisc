@@ -6,6 +6,11 @@ def get_compressed_register_index_binary(index) -> str:
     return '{0:03b}'.format(int(index) - 8)
 
 
+def get_immediate_binary_4(value) -> str:
+    value &= 0xf
+    return '{0:04b}'.format(int(value))
+
+
 def get_immediate_binary_5(value) -> str:
     value &= 0x1f
     return '{0:05b}'.format(int(value))

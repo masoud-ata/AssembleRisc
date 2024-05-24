@@ -20,6 +20,7 @@ class AssembleRisc:
             'jalr_instruction': self._decode_jalr_instruction,
             'b_instruction': self._decode_b_instruction,
             's_instruction': self._decode_s_instruction,
+            'fence_instruction': self._decode_fence_instruction,
             'compressed_r_instruction': self._decode_compressed_r_instruction,
             'compressed_i_instruction': self._decode_compressed_i_instruction,
             'compressed_b_instruction': self._decode_compressed_b_instruction,
@@ -116,6 +117,20 @@ class AssembleRisc:
         funct3_bits = S_FUNCT3[instruction['opcode']]
         imm_bits_11to5, imm_bits_4to0 = get_immediate_binary_12s(instruction['imm'])
         return imm_bits_11to5 + rs2_bits + rs1_bits + funct3_bits + imm_bits_4to0 + opcode_bits
+
+    def _decode_fence_instruction(self) -> str:
+        def fence_operand_to_bits(op: str) -> str:
+            replace_dict = {"i": "8", "o": "4", "r": "2", "w": "1"}
+            pred_vals = "".join([replace_dict.get(c, c) for c in op])
+            return get_immediate_binary_4(sum([int(x) for x in pred_vals]))
+        instruction = self.parse_info
+        pred, succ = instruction['pred'], instruction['succ']
+        pred_bits, succ_bits = fence_operand_to_bits(pred), fence_operand_to_bits(succ)
+        opcode_bits = FENCE_OPCODE
+        rs1_bits = '00000'
+        rd_bits = '00000'
+        funct3_bits = FENCE_FUNCT3[instruction['opcode']]
+        return '0000' + pred_bits + succ_bits + rs1_bits + funct3_bits + rd_bits + opcode_bits
 
     def _decode_compressed_r_instruction(self) -> str:
         instruction = self.parse_info

@@ -36,3 +36,24 @@ csrrc x22, mtinst, x15
 csrrwi x10, mtinst, 6
 csrrsi x11, 0x34a, 7
 csrrci x12, mtinst, 0x5
+
+fence r, r
+fence rw, r
+fence i, r
+fence o, r
+fence io, r
+fence iorw, iorw
+fence iorw, i
+fence iorw, o
+fence iorw, r
+fence iorw, w
+fence iorw, rw
+fence iorw, io
+fence iorw, ir
+fence iorw, irw
+fence iorw, iw
+fence iow, iw
+fence irw, iw
+fence orw, orw
+fence or, orw
+fence.i

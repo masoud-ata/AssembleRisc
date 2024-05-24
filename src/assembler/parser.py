@@ -42,8 +42,16 @@ def p_instruction_no_args(p):
             'imm': 0,
             'lineno': p.lineno(1)
         }
+    elif p[1] == INSTRUCTION_FENCE_I:
+        p[0] = {
+            'type': 'fence_instruction',
+            'opcode': p[1],
+            'pred': "",
+            'succ': "",
+            'lineno': p.lineno(1)
+        }
     else:
-        error_message = f'Error: unrecognized instruction at line {p.lineno(1)}'
+        error_message = f'Error: unrecognized or incomplete instruction at line {p.lineno(1)}'
         raise Exception(error_message)
 
 
@@ -150,6 +158,29 @@ def p_instruction_xreg_id_xreg(p):
         'rd': get_x_register_index(p[2]),
         'rs1': get_x_register_index(p[6]),
         'imm': CSR_ENCODING_TABLE[p[4]],
+        'lineno': p.lineno(1)
+    }
+
+
+def p_instruction_xreg_id_id(p):
+    """expression : ID ID COMMA ID NEWLINE"""
+    def is_in_alphabetical_order(word: str) -> bool:
+        return word == ''.join(sorted(word))
+    pred, succ = p[2], p[4]
+    if p[1] != INSTRUCTION_FENCE:
+        error_message = f'Error: illegal or incomplete instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+    if not set(pred).issubset(set(FENCE_ALL_MODES)) or not set(succ).issubset(set(FENCE_ALL_MODES)):
+        error_message = f'Error: illegal operands at line {p.lineno(1)}'
+        raise Exception(error_message)
+    if not is_in_alphabetical_order(pred) or not is_in_alphabetical_order(succ):
+        error_message = f'Error: illegal operands at line {p.lineno(1)}'
+        raise Exception(error_message)
+    p[0] = {
+        'type': 'fence_instruction',
+        'opcode': p[1],
+        'pred': p[2],
+        'succ': p[4],
         'lineno': p.lineno(1)
     }
 

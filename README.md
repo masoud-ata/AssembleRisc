@@ -36,8 +36,8 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |    addi     |   I    |  &check;  |    auipc    |   U    |  &check;  | 
 |    slti     |   I    |  &check;  |     jal     |   J    |  &check;  | 
 |    sltiu    |   I    |  &check;  |    jalr     |   J    |  &check;  | 
-|    xori     |   I    |  &check;  |    fence    |   I    |    |   
-|     ori     |   I    |  &check;  |   fence.i   |   I    |    | 
+|    xori     |   I    |  &check;  |    fence    |   I    |  &check;  |   
+|     ori     |   I    |  &check;  |   fence.i   |   I    |  &check;  | 
 |    andi     |   I    |  &check;  |    ecall    |   I    |  &check;  |  
 |    slli     |   I    |  &check;  |   ebreak    |   I    |  &check;  |  
 |    srli     |   I    |  &check;  |    csrrw    |   I    |  &check;  |  
