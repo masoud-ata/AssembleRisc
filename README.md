@@ -40,9 +40,9 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |     ori     |   I    |  &check;  |   fence.i   |   I    |    | 
 |    andi     |   I    |  &check;  |    ecall    |   I    |  &check;  |  
 |    slli     |   I    |  &check;  |   ebreak    |   I    |  &check;  |  
-|    srli     |   I    |  &check;  |    csrrw    |   I    |    |  
-|    srai     |   I    |  &check;  |    csrrs    |   I    |    | 
-|     lb      |   I    |  &check;  |    csrrc    |   I    |    | 
+|    srli     |   I    |  &check;  |    csrrw    |   I    |  &check;  |  
+|    srai     |   I    |  &check;  |    csrrs    |   I    |  &check;  | 
+|     lb      |   I    |  &check;  |    csrrc    |   I    |  &check;  | 
 |     lh      |   I    |  &check;  |   csrrwi    |   I    |    | 
 |     lw      |   I    |  &check;  |   csrrsi    |   I    |    | 
 |     lbu     |   I    |  &check;  |   csrrci    |   I    |    | 
