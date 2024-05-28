@@ -159,12 +159,23 @@ class AssembleRisc:
     def _decode_compressed_i_instruction(self) -> str:
         instruction = self.parse_info
         opcode_bits = COMPRESSED_I_OPCODE[instruction['opcode']]
-        if instruction['opcode'] in [INSTRUCTION_C_ADDI, INSTRUCTION_C_LI, INSTRUCTION_C_LUI, INSTRUCTION_C_SLLI]:
+        if (
+            instruction['opcode'] in [
+                INSTRUCTION_C_ADDI, INSTRUCTION_C_LI, INSTRUCTION_C_LUI, INSTRUCTION_C_SLLI,
+                INSTRUCTION_C_ADDI16SP, INSTRUCTION_C_NOP
+            ]
+        ):
             if instruction['opcode'] == INSTRUCTION_C_LUI and int(instruction['rd']) == 2:
                 error_message = 'Error: illegal operands at line {}'.format(str(instruction['lineno']))
                 raise Exception(error_message)
+            if instruction['opcode'] == INSTRUCTION_C_ADDI16SP and int(instruction['rd']) != 2:
+                error_message = 'Error: illegal operands at line {}'.format(str(instruction['lineno']))
+                raise Exception(error_message)
             rd_bits = get_register_index_binary(instruction['rd'])
-            imm_bits = get_immediate_binary_6(instruction['imm'])
+            if instruction['opcode'] == INSTRUCTION_C_ADDI16SP:
+                imm_bits = get_immediate_binary_6_addi16sp(instruction['imm'])
+            else:
+                imm_bits = get_immediate_binary_6(instruction['imm'])
             funct3_bits = COMPRESSED_I_FUNCT3[instruction['opcode']]
             return funct3_bits + imm_bits[0] + rd_bits + imm_bits[1:6] + opcode_bits
         else:

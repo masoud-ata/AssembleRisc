@@ -57,3 +57,10 @@ fence irw, iw
 fence orw, orw
 fence or, orw
 fence.i
+fence
+fence iorw, iorw
+c.lui x5, 0x1e
+c.addi16sp sp, 32
+c.addi16sp sp, 496
+c.addi16sp sp, -512
+c.nop

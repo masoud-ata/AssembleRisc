@@ -43,7 +43,7 @@ def t_F_REGISTER(token):
 
 
 def t_COMPRESSED_ID(token):
-    r'c\.[a-z]+'
+    r'c\.[a-z0-9]+'
     token.type = "COMPRESSED_ID"
     return token
 

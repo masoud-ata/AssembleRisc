@@ -42,12 +42,13 @@ def p_instruction_no_args(p):
             'imm': 0,
             'lineno': p.lineno(1)
         }
-    elif p[1] == INSTRUCTION_FENCE_I:
+    elif p[1] in I_FENCE_INSTRUCTIONS:
+        operand_field = "" if p[1] == INSTRUCTION_FENCE_I else FENCE_ALL_MODES
         p[0] = {
             'type': 'fence_instruction',
             'opcode': p[1],
-            'pred': "",
-            'succ': "",
+            'pred': operand_field,
+            'succ': operand_field,
             'lineno': p.lineno(1)
         }
     else:
@@ -240,6 +241,21 @@ def p_instruction_xreg_xreg_id(p):
     }
 
 
+def p_compressed_instruction(p):
+    """expression : COMPRESSED_ID NEWLINE"""
+    if p[1] == INSTRUCTION_C_NOP:
+        p[0] = {
+            'type': 'compressed_i_instruction',
+            'opcode': p[1],
+            'rd': '0',
+            'imm': 0,
+            'lineno': p.lineno(1)
+        }
+    else:
+        error_message = f'Error: illegal or incomplete instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+
+
 def p_compressed_instruction_xreg_xreg(p):
     """expression : COMPRESSED_ID register COMMA register NEWLINE"""
     p[0] = {
@@ -266,6 +282,11 @@ def p_compressed_instruction_xreg_imm(p):
             'lineno': p.lineno(1)
         }
     else:
+        if p[1] == INSTRUCTION_C_ADDI16SP:
+            imm_value = to_int(p[4])
+            if imm_value == 0 or (imm_value % 16) != 0:
+                error_message = f'Error: illegal operands at line {p.lineno(1)}'
+                raise Exception(error_message)
         p[0] = {
             'type': 'compressed_i_instruction',
             'opcode': p[1],

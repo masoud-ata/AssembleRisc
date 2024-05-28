@@ -59,18 +59,18 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |    c.sw     |   CS   |  &check;  |    c.jal    |   CJ   |  &check;  |
 |   c.beqz    |   CB   |  &check;  |    c.jr     |   CR   |  &check;  | 
 |   c.bneq    |   CB   |  &check;  |   c.jalr    |   CR   |  &check;  | 
-|    c.li     |   CI   |  &check;  |    c.nop    |        |    | 
-|    c.lui    |   CI   |  &check;  | c.addi16sp  |        |    | 
-|   c.addi    |   CI   |  &check;  | c.addi4spn  |        |    | 
-|   c.slli    |   CI   |  &check;  |    c.fld    |        |    | 
-|   c.srli    |   CB   |  &check;  |    c.flw    |        |    |
-|  c.slli64   |        |           |    c.fsd    |        |    | 
-|   c.fldsp   |        |           |    c.fsw    |        |    |
-|   c.lwsp    |        |           |    c.nop    |        |    |
-|   c.flwsp   |        |           |  c.ebreak   |        |    |
-|   c.fsdsp   |        |           |             |        |    |
-|   c.swsp    |        |           |             |        |    |
-|   c.fswsp   |        |           |             |        |    |
+|    c.li     |   CI   |  &check;  |    c.nop    |   CI   |  &check;  | 
+|    c.lui    |   CI   |  &check;  | c.addi16sp  |   CI   |  &check;  | 
+|   c.addi    |   CI   |  &check;  | c.addi4spn  |        |           | 
+|   c.slli    |   CI   |  &check;  |    c.fld    |        |           | 
+|   c.srli    |   CB   |  &check;  |    c.flw    |        |           |
+|  c.slli64   |        |           |    c.fsd    |        |           | 
+|   c.fldsp   |        |           |    c.fsw    |        |           |
+|   c.lwsp    |        |           |    c.nop    |        |           |
+|   c.flwsp   |        |           |  c.ebreak   |        |           |
+|   c.fsdsp   |        |           |             |        |           |
+|   c.swsp    |        |           |             |        |           |
+|   c.fswsp   |        |           |             |        |           |
 
 
 ### RV32M
