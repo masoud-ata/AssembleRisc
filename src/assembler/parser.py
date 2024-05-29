@@ -267,6 +267,31 @@ def p_compressed_instruction_xreg_xreg(p):
     }
 
 
+
+def p_compressed_instruction_xreg_xreg_imm(p):
+    """expression : COMPRESSED_ID register COMMA register COMMA IMMEDIATE NEWLINE"""
+    if p[1] != INSTRUCTION_C_ADDI4SPN:
+        error_message = f'Error: illegal or incomplete instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+    x_reg_rd_index = int(get_x_register_index(p[2]))
+    x_reg_rs_index = int(get_x_register_index(p[4]))
+    if x_reg_rd_index < 8 or x_reg_rd_index > 15 or x_reg_rs_index != 2:
+        error_message = f'Error: illegal operands at line {p.lineno(1)}'
+        raise Exception(error_message)
+    imm_value = to_int(p[6])
+    if imm_value == 0 or (imm_value % 4) != 0:
+        error_message = f'Error: illegal operands at line {p.lineno(1)}'
+        raise Exception(error_message)
+
+    p[0] = {
+        'type': 'compressed_i_instruction',
+        'opcode': p[1],
+        'rd': get_x_register_index(p[2]),
+        'imm': to_int(p[6]),
+        'lineno': p.lineno(1)
+    }
+
+
 def p_compressed_instruction_xreg_imm(p):
     """expression : COMPRESSED_ID register COMMA IMMEDIATE NEWLINE"""
     if p[1] in COMPRESSED_B_INSTRUCTIONS:
@@ -327,6 +352,32 @@ def p_compressed_instruction_xreg_imm_lparen_xreg_rparen(p):
             'type': 'compressed_l_store_instruction',
             'opcode': p[1],
             'rs2': get_x_register_index(p[2]),
+            'rs1': get_x_register_index(p[6]),
+            'imm': to_int(p[4]),
+            'lineno': p.lineno(1)
+        }
+
+
+def p_compressed_instruction_freg_imm_lparen_xreg_rparen(p):
+    """expression : COMPRESSED_ID f_register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
+    f_reg_index = int(get_f_register_index(p[2]))
+    if f_reg_index < 8 or f_reg_index > 15:
+        error_message = f'Error: illegal operands at line {p.lineno(1)}'
+        raise Exception(error_message)
+    if p[1] in [INSTRUCTION_C_FLW, INSTRUCTION_C_FLD]:
+        p[0] = {
+            'type': 'compressed_l_load_instruction',
+            'opcode': p[1],
+            'rd': get_f_register_index(p[2]),
+            'rs1': get_x_register_index(p[6]),
+            'imm': to_int(p[4]),
+            'lineno': p.lineno(1)
+        }
+    elif p[1] in [INSTRUCTION_C_FSW, INSTRUCTION_C_FSD]:
+        p[0] = {
+            'type': 'compressed_l_store_instruction',
+            'opcode': p[1],
+            'rs2': get_f_register_index(p[2]),
             'rs1': get_x_register_index(p[6]),
             'imm': to_int(p[4]),
             'lineno': p.lineno(1)

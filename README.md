@@ -61,13 +61,13 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |   c.bneq    |   CB   |  &check;  |   c.jalr    |   CR   |  &check;  | 
 |    c.li     |   CI   |  &check;  |    c.nop    |   CI   |  &check;  | 
 |    c.lui    |   CI   |  &check;  | c.addi16sp  |   CI   |  &check;  | 
-|   c.addi    |   CI   |  &check;  | c.addi4spn  |        |           | 
-|   c.slli    |   CI   |  &check;  |    c.fld    |        |           | 
-|   c.srli    |   CB   |  &check;  |    c.flw    |        |           |
-|  c.slli64   |        |           |    c.fsd    |        |           | 
-|   c.fldsp   |        |           |    c.fsw    |        |           |
-|   c.lwsp    |        |           |    c.nop    |        |           |
-|   c.flwsp   |        |           |  c.ebreak   |        |           |
+|   c.addi    |   CI   |  &check;  | c.addi4spn  |  CIW   |  &check;  | 
+|   c.slli    |   CI   |  &check;  |    c.fld    |   CL   |  &check;  | 
+|   c.srli    |   CB   |  &check;  |    c.flw    |   CL   |  &check;  |
+|  c.slli64   |        |           |    c.fsd    |   CS   |  &check;  | 
+|   c.fldsp   |        |           |    c.fsw    |   CS   |  &check;  |
+|   c.lwsp    |        |           |  c.ebreak   |        |           |
+|   c.flwsp   |        |           |             |        |           |
 |   c.fsdsp   |        |           |             |        |           |
 |   c.swsp    |        |           |             |        |           |
 |   c.fswsp   |        |           |             |        |           |

@@ -32,6 +32,12 @@ def get_immediate_binary_8(value) -> str:
     return '{0:08b}'.format(int(value))
 
 
+def get_immediate_binary_8_addi4spn(value) -> str:
+    value >>= 2
+    imm_bits = get_immediate_binary_8(value)
+    return imm_bits[4:6] + imm_bits[0:4] + imm_bits[7] + imm_bits[6]
+
+
 def get_immediate_binary_12(value) -> str:
     value &= 0xfff
     return '{0:012b}'.format(int(value))
@@ -75,6 +81,14 @@ def get_immediate_binary_5_compressed_l(value) -> (str, str):
     imm_bits_5to3 = imm_bits[1:4]
     imm_bits_2_6 = imm_bits[4] + imm_bits[0]
     return imm_bits_5to3, imm_bits_2_6
+
+
+def get_immediate_binary_5_compressed_l_d(value) -> (str, str):
+    value //= 8
+    imm_bits = get_immediate_binary_5(value)
+    imm_bits_5to3 = imm_bits[2:5]
+    imm_bits_7to6 = imm_bits[0:2]
+    return imm_bits_5to3, imm_bits_7to6
 
 
 def get_immediate_binary_11_compressed_j(value) -> str:

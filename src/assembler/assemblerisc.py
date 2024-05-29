@@ -159,10 +159,15 @@ class AssembleRisc:
     def _decode_compressed_i_instruction(self) -> str:
         instruction = self.parse_info
         opcode_bits = COMPRESSED_I_OPCODE[instruction['opcode']]
-        if (
+        rd_bits = get_compressed_register_index_binary(instruction['rd'])
+        if instruction['opcode'] == INSTRUCTION_C_ADDI4SPN:
+            imm_bits = get_immediate_binary_8_addi4spn(instruction['imm'])
+            funct3_bits = COMPRESSED_I_FUNCT3[instruction['opcode']]
+            return funct3_bits + imm_bits + rd_bits + opcode_bits
+        elif (
             instruction['opcode'] in [
                 INSTRUCTION_C_ADDI, INSTRUCTION_C_LI, INSTRUCTION_C_LUI, INSTRUCTION_C_SLLI,
-                INSTRUCTION_C_ADDI16SP, INSTRUCTION_C_NOP
+                INSTRUCTION_C_ADDI16SP, INSTRUCTION_C_NOP, INSTRUCTION_C_ADDI4SPN
             ]
         ):
             if instruction['opcode'] == INSTRUCTION_C_LUI and int(instruction['rd']) == 2:
@@ -202,27 +207,39 @@ class AssembleRisc:
 
     def _decode_compressed_l_load_instruction(self) -> str:
         instruction = self.parse_info
+        if instruction['opcode'] in [INSTRUCTION_C_LW, INSTRUCTION_C_FLW] and int(instruction['imm']) % 4 != 0:
+            error_message = 'Error: illegal immediate operand at line {}'.format(str(instruction['lineno']))
+            raise Exception(error_message)
+        if instruction['opcode'] == INSTRUCTION_C_FLD and int(instruction['imm']) % 8 != 0:
+            error_message = 'Error: illegal immediate operand at line {}'.format(str(instruction['lineno']))
+            raise Exception(error_message)
         opcode_bits = '00'
         rd_bits = get_compressed_register_index_binary(instruction['rd'])
         rs1_bits = get_compressed_register_index_binary(instruction['rs1'])
         funct3_bits = COMPRESSED_L_FUNCT3[instruction['opcode']]
-        if int(instruction['imm']) % 4 != 0:
-            error_message = 'Error: illegal immediate operand at line {}'.format(str(instruction['lineno']))
-            raise Exception(error_message)
-        imm_bits_5to3, imm_bits_2_6 = get_immediate_binary_5_compressed_l(instruction['imm'])
-        return funct3_bits + imm_bits_5to3 + rs1_bits + imm_bits_2_6 + rd_bits + opcode_bits
+        if instruction['opcode'] in [INSTRUCTION_C_LW, INSTRUCTION_C_FLW]:
+            imm_bits_part1, imm_bits_part2 = get_immediate_binary_5_compressed_l(instruction['imm'])
+        else:
+            imm_bits_part1, imm_bits_part2 = get_immediate_binary_5_compressed_l_d(instruction['imm'])
+        return funct3_bits + imm_bits_part1 + rs1_bits + imm_bits_part2 + rd_bits + opcode_bits
 
     def _decode_compressed_l_store_instruction(self) -> str:
         instruction = self.parse_info
+        if instruction['opcode'] in [INSTRUCTION_C_SW, INSTRUCTION_C_FSW] and int(instruction['imm']) % 4 != 0:
+            error_message = 'Error: illegal immediate operand at line {}'.format(str(instruction['lineno']))
+            raise Exception(error_message)
+        if instruction['opcode'] == INSTRUCTION_C_FSD and int(instruction['imm']) % 8 != 0:
+            error_message = 'Error: illegal immediate operand at line {}'.format(str(instruction['lineno']))
+            raise Exception(error_message)
         opcode_bits = '00'
         rs2_bits = get_compressed_register_index_binary(instruction['rs2'])
         rs1_bits = get_compressed_register_index_binary(instruction['rs1'])
         funct3_bits = COMPRESSED_L_FUNCT3[instruction['opcode']]
-        if int(instruction['imm']) % 4 != 0:
-            error_message = 'Error: illegal immediate operand at line {}'.format(str(instruction['lineno']))
-            raise Exception(error_message)
-        imm_bits_5to3, imm_bits_2_6 = get_immediate_binary_5_compressed_l(instruction['imm'])
-        return funct3_bits + imm_bits_5to3 + rs1_bits + imm_bits_2_6 + rs2_bits + opcode_bits
+        if instruction['opcode'] in [INSTRUCTION_C_SW, INSTRUCTION_C_FSW]:
+            imm_bits_part1, imm_bits_part2 = get_immediate_binary_5_compressed_l(instruction['imm'])
+        else:
+            imm_bits_part1, imm_bits_part2 = get_immediate_binary_5_compressed_l_d(instruction['imm'])
+        return funct3_bits + imm_bits_part1 + rs1_bits + imm_bits_part2 + rs2_bits + opcode_bits
 
     def _decode_compressed_j_instruction(self) -> str:
         instruction = self.parse_info
