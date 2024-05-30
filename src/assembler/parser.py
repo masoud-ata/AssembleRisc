@@ -251,6 +251,14 @@ def p_compressed_instruction(p):
             'imm': 0,
             'lineno': p.lineno(1)
         }
+    elif p[1] == INSTRUCTION_C_EBREAK:
+        p[0] = {
+            'type': 'compressed_i_instruction',
+            'opcode': p[1],
+            'rd': '0',
+            'imm': 0x20,
+            'lineno': p.lineno(1)
+        }
     else:
         error_message = f'Error: illegal or incomplete instruction at line {p.lineno(1)}'
         raise Exception(error_message)
@@ -338,7 +346,18 @@ def p_compressed_instruction_xreg_id(p):
 
 def p_compressed_instruction_xreg_imm_lparen_xreg_rparen(p):
     """expression : COMPRESSED_ID register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
-    if p[1] == INSTRUCTION_C_LW:
+    if p[1] == INSTRUCTION_C_LWSP:
+        if get_x_register_index(p[6]) != '2':
+            error_message = f'Error: illegal operands at line {p.lineno(1)}'
+            raise Exception(error_message)
+        p[0] = {
+            'type': 'compressed_i_instruction',
+            'opcode': p[1],
+            'rd': get_x_register_index(p[2]),
+            'imm': to_int(p[4]),
+            'lineno': p.lineno(1)
+        }
+    elif p[1] == INSTRUCTION_C_LW:
         p[0] = {
             'type': 'compressed_l_load_instruction',
             'opcode': p[1],
@@ -360,28 +379,40 @@ def p_compressed_instruction_xreg_imm_lparen_xreg_rparen(p):
 
 def p_compressed_instruction_freg_imm_lparen_xreg_rparen(p):
     """expression : COMPRESSED_ID f_register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
-    f_reg_index = int(get_f_register_index(p[2]))
-    if f_reg_index < 8 or f_reg_index > 15:
-        error_message = f'Error: illegal operands at line {p.lineno(1)}'
-        raise Exception(error_message)
-    if p[1] in [INSTRUCTION_C_FLW, INSTRUCTION_C_FLD]:
+    if p[1] in [INSTRUCTION_C_FLWSP, INSTRUCTION_C_FLDSP]:
+        if get_x_register_index(p[6]) != '2':
+            error_message = f'Error: illegal operands at line {p.lineno(1)}'
+            raise Exception(error_message)
         p[0] = {
-            'type': 'compressed_l_load_instruction',
+            'type': 'compressed_i_instruction',
             'opcode': p[1],
             'rd': get_f_register_index(p[2]),
-            'rs1': get_x_register_index(p[6]),
             'imm': to_int(p[4]),
             'lineno': p.lineno(1)
         }
-    elif p[1] in [INSTRUCTION_C_FSW, INSTRUCTION_C_FSD]:
-        p[0] = {
-            'type': 'compressed_l_store_instruction',
-            'opcode': p[1],
-            'rs2': get_f_register_index(p[2]),
-            'rs1': get_x_register_index(p[6]),
-            'imm': to_int(p[4]),
-            'lineno': p.lineno(1)
-        }
+    elif p[1] in [INSTRUCTION_C_FLW, INSTRUCTION_C_FLD, INSTRUCTION_C_FSW, INSTRUCTION_C_FSD]:
+        f_reg_index = int(get_f_register_index(p[2]))
+        if f_reg_index < 8 or f_reg_index > 15:
+            error_message = f'Error: illegal operands at line {p.lineno(1)}'
+            raise Exception(error_message)
+        if p[1] in [INSTRUCTION_C_FLW, INSTRUCTION_C_FLD]:
+            p[0] = {
+                'type': 'compressed_l_load_instruction',
+                'opcode': p[1],
+                'rd': get_f_register_index(p[2]),
+                'rs1': get_x_register_index(p[6]),
+                'imm': to_int(p[4]),
+                'lineno': p.lineno(1)
+            }
+        elif p[1] in [INSTRUCTION_C_FSW, INSTRUCTION_C_FSD]:
+            p[0] = {
+                'type': 'compressed_l_store_instruction',
+                'opcode': p[1],
+                'rs2': get_f_register_index(p[2]),
+                'rs1': get_x_register_index(p[6]),
+                'imm': to_int(p[4]),
+                'lineno': p.lineno(1)
+            }
 
 
 def p_compressed_instruction_imm(p):
@@ -396,15 +427,24 @@ def p_compressed_instruction_imm(p):
 
 def p_compressed_instruction_xreg(p):
     """expression : COMPRESSED_ID register NEWLINE"""
-    if p[1] not in COMPRESSED_J_R_INSTRUCTIONS:
+    if p[1] in COMPRESSED_J_R_INSTRUCTIONS:
+        p[0] = {
+            'type': 'compressed_j_r_instruction',
+            'opcode': p[1],
+            'rs1': get_x_register_index(p[2]),
+            'lineno': p.lineno(1)
+        }
+    elif p[1] == INSTRUCTION_C_SLLI64:
+        p[0] = {
+            'type': 'compressed_i_instruction',
+            'opcode': p[1],
+            'rd': get_x_register_index(p[2]),
+            'imm': 0,
+            'lineno': p.lineno(1)
+        }
+    else:
         error_message = f'Error: illegal or incomplete instruction at line {p.lineno(1)}'
         raise Exception(error_message)
-    p[0] = {
-        'type': 'compressed_j_r_instruction',
-        'opcode': p[1],
-        'rs1': get_x_register_index(p[2]),
-        'lineno': p.lineno(1)
-    }
 
 
 def p_floating_point_instruction_freg_freg_freg(p):

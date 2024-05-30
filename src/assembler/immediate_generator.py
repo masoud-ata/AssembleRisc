@@ -27,6 +27,18 @@ def get_immediate_binary_6_addi16sp(value) -> str:
     return imm_bits[0] + imm_bits[5] + imm_bits[3] + imm_bits[1:3] + imm_bits[4]
 
 
+def get_immediate_binary_6_lwsp(value) -> str:
+    value >>= 2
+    imm_bits = get_immediate_binary_6(value)
+    return imm_bits[2] + imm_bits[3:6] + imm_bits[0:2]
+
+
+def get_immediate_binary_6_ldsp(value) -> str:
+    value >>= 3
+    imm_bits = get_immediate_binary_6(value)
+    return imm_bits[3] + imm_bits[4:6] + imm_bits[0:3]
+
+
 def get_immediate_binary_8(value) -> str:
     value &= 0xff
     return '{0:08b}'.format(int(value))

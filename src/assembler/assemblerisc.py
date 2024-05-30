@@ -167,7 +167,8 @@ class AssembleRisc:
         elif (
             instruction['opcode'] in [
                 INSTRUCTION_C_ADDI, INSTRUCTION_C_LI, INSTRUCTION_C_LUI, INSTRUCTION_C_SLLI,
-                INSTRUCTION_C_ADDI16SP, INSTRUCTION_C_NOP, INSTRUCTION_C_ADDI4SPN
+                INSTRUCTION_C_ADDI16SP, INSTRUCTION_C_NOP, INSTRUCTION_C_ADDI4SPN, INSTRUCTION_C_EBREAK,
+                INSTRUCTION_C_SLLI64, INSTRUCTION_C_LWSP, INSTRUCTION_C_FLWSP, INSTRUCTION_C_FLDSP
             ]
         ):
             if instruction['opcode'] == INSTRUCTION_C_LUI and int(instruction['rd']) == 2:
@@ -177,12 +178,17 @@ class AssembleRisc:
                 error_message = 'Error: illegal operands at line {}'.format(str(instruction['lineno']))
                 raise Exception(error_message)
             rd_bits = get_register_index_binary(instruction['rd'])
-            if instruction['opcode'] == INSTRUCTION_C_ADDI16SP:
+            if instruction['opcode'] in [INSTRUCTION_C_FLDSP]:
+                imm_bits = get_immediate_binary_6_ldsp(instruction['imm'])
+            elif instruction['opcode'] in [INSTRUCTION_C_LWSP, INSTRUCTION_C_FLWSP]:
+                imm_bits = get_immediate_binary_6_lwsp(instruction['imm'])
+            elif instruction['opcode'] == INSTRUCTION_C_ADDI16SP:
                 imm_bits = get_immediate_binary_6_addi16sp(instruction['imm'])
             else:
                 imm_bits = get_immediate_binary_6(instruction['imm'])
+            imm_bits_part1, imm_bits_part2 = imm_bits[0], imm_bits[1:6]
             funct3_bits = COMPRESSED_I_FUNCT3[instruction['opcode']]
-            return funct3_bits + imm_bits[0] + rd_bits + imm_bits[1:6] + opcode_bits
+            return funct3_bits + imm_bits_part1 + rd_bits + imm_bits_part2 + opcode_bits
         else:
             if int(instruction['rd']) < 8 or int(instruction['rd']) > 15:
                 error_message = 'Error: illegal operands at line {}'.format(str(instruction['lineno']))
