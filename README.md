@@ -90,3 +90,10 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |   fdiv.s    |   R    |  &check;  |   fsqrt.s   |   R    |  &check;  | 
 |   fmv.x.w   |   R    |  &check;  |     flw     |   I    |  &check;  |   
 |   fmv.w.x   |   R    |  &check;  |     fsw     |   S    |  &check;  | 
+|   fsgnj.s   |   R    |           |  fcvt.s.w   |   R    |           |
+|  fsgnjn.s   |   R    |           |  fcvt.s.wu  |   R    |           |    
+|  fsgnjx.s   |   R    |           |  fclass.s   |   R    |           |    
+|   fmin.s    |   R    |           |   fmadd.s   |   R4   |           | 
+|   fmax.s    |   R    |           |   fmsub.s   |   R4   |           |   
+|  fcvt.w.s   |   R    |           |  fnmsub.s   |   R4   |           | 
+|  fcvt.wu.s  |   R    |           |  fnmadd.s   |   R4   |           | 
