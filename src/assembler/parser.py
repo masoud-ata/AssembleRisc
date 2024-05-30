@@ -346,7 +346,18 @@ def p_compressed_instruction_xreg_id(p):
 
 def p_compressed_instruction_xreg_imm_lparen_xreg_rparen(p):
     """expression : COMPRESSED_ID register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
-    if p[1] == INSTRUCTION_C_LWSP:
+    if p[1] == INSTRUCTION_C_SWSP:
+        if get_x_register_index(p[6]) != '2':
+            error_message = f'Error: illegal operands at line {p.lineno(1)}'
+            raise Exception(error_message)
+        p[0] = {
+            'type': 'compressed_store_sp_instruction',
+            'opcode': p[1],
+            'rs2': get_x_register_index(p[2]),
+            'imm': to_int(p[4]),
+            'lineno': p.lineno(1)
+        }
+    elif p[1] == INSTRUCTION_C_LWSP:
         if get_x_register_index(p[6]) != '2':
             error_message = f'Error: illegal operands at line {p.lineno(1)}'
             raise Exception(error_message)
@@ -379,7 +390,18 @@ def p_compressed_instruction_xreg_imm_lparen_xreg_rparen(p):
 
 def p_compressed_instruction_freg_imm_lparen_xreg_rparen(p):
     """expression : COMPRESSED_ID f_register COMMA IMMEDIATE LEFT_PAREN register RIGHT_PAREN NEWLINE"""
-    if p[1] in [INSTRUCTION_C_FLWSP, INSTRUCTION_C_FLDSP]:
+    if p[1] in [INSTRUCTION_C_FSWSP, INSTRUCTION_C_FSDSP]:
+        if get_x_register_index(p[6]) != '2':
+            error_message = f'Error: illegal operands at line {p.lineno(1)}'
+            raise Exception(error_message)
+        p[0] = {
+            'type': 'compressed_store_sp_instruction',
+            'opcode': p[1],
+            'rs2': get_f_register_index(p[2]),
+            'imm': to_int(p[4]),
+            'lineno': p.lineno(1)
+        }
+    elif p[1] in [INSTRUCTION_C_FLWSP, INSTRUCTION_C_FLDSP]:
         if get_x_register_index(p[6]) != '2':
             error_message = f'Error: illegal operands at line {p.lineno(1)}'
             raise Exception(error_message)

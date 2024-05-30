@@ -26,6 +26,7 @@ class AssembleRisc:
             'compressed_b_instruction': self._decode_compressed_b_instruction,
             'compressed_l_load_instruction': self._decode_compressed_l_load_instruction,
             'compressed_l_store_instruction': self._decode_compressed_l_store_instruction,
+            'compressed_store_sp_instruction': self._decode_compressed_store_sp_instruction,
             'compressed_j_instruction': self._decode_compressed_j_instruction,
             'compressed_j_r_instruction': self._decode_compressed_j_r_instruction,
             'floating_point_r_instruction': self._decode_floating_point_r_instruction
@@ -246,6 +247,23 @@ class AssembleRisc:
         else:
             imm_bits_part1, imm_bits_part2 = get_immediate_binary_5_compressed_l_d(instruction['imm'])
         return funct3_bits + imm_bits_part1 + rs1_bits + imm_bits_part2 + rs2_bits + opcode_bits
+
+    def _decode_compressed_store_sp_instruction(self) -> str:
+        instruction = self.parse_info
+        if instruction['opcode'] in [INSTRUCTION_C_SWSP, INSTRUCTION_C_FSWSP] and int(instruction['imm']) % 4 != 0:
+            error_message = 'Error: illegal immediate operand at line {}'.format(str(instruction['lineno']))
+            raise Exception(error_message)
+        if instruction['opcode'] == INSTRUCTION_C_FSDSP and int(instruction['imm']) % 8 != 0:
+            error_message = 'Error: illegal immediate operand at line {}'.format(str(instruction['lineno']))
+            raise Exception(error_message)
+        opcode_bits = '10'
+        rs2_bits = get_register_index_binary(instruction['rs2'])
+        if instruction['opcode'] == INSTRUCTION_C_FSDSP:
+            imm_bits = get_immediate_binary_6_sdsp(instruction['imm'])
+        else:
+            imm_bits = get_immediate_binary_6_swsp(instruction['imm'])
+        funct3_bits = COMPRESSED_STORE_SP_FUNCT3[instruction['opcode']]
+        return funct3_bits + imm_bits + rs2_bits + opcode_bits
 
     def _decode_compressed_j_instruction(self) -> str:
         instruction = self.parse_info

@@ -33,10 +33,22 @@ def get_immediate_binary_6_lwsp(value) -> str:
     return imm_bits[2] + imm_bits[3:6] + imm_bits[0:2]
 
 
+def get_immediate_binary_6_swsp(value) -> str:
+    value >>= 2
+    imm_bits = get_immediate_binary_6(value)
+    return imm_bits[2:6] + imm_bits[0:2]
+
+
 def get_immediate_binary_6_ldsp(value) -> str:
     value >>= 3
     imm_bits = get_immediate_binary_6(value)
     return imm_bits[3] + imm_bits[4:6] + imm_bits[0:3]
+
+
+def get_immediate_binary_6_sdsp(value) -> str:
+    value >>= 3
+    imm_bits = get_immediate_binary_6(value)
+    return imm_bits[3:6] + imm_bits[0:3]
 
 
 def get_immediate_binary_8(value) -> str:

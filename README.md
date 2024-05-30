@@ -68,9 +68,9 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |   c.fldsp   |   CI   |  &check;  |    c.fsw    |   CS   |  &check;  |
 |   c.lwsp    |   CI   |  &check;  |  c.ebreak   |   CI   |  &check;  |
 |   c.flwsp   |   CI   |  &check;  |             |        |           |
-|   c.fsdsp   |        |           |             |        |           |
-|   c.swsp    |        |           |             |        |           |
-|   c.fswsp   |        |           |             |        |           |
+|   c.fsdsp   |  CSS   |  &check;  |             |        |           |
+|   c.swsp    |  CSS   |  &check;  |             |        |           |
+|   c.fswsp   |  CSS   |  &check;  |             |        |           |
 
 
 ### RV32M
