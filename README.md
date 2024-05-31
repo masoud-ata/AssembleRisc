@@ -1,5 +1,5 @@
 # AssembleRisc
-A Python assembler for RISC-V with support for RV32I, RV32C, RV32M, and RV32F extensions
+A Python assembler for RISC-V with support for RV32I, RV32C, RV32M, RV32F, and RV32A extensions
 
 
 ## Requirements
@@ -97,3 +97,13 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |   fmax.s    |   R    |           |   fmsub.s   |   R4   |           |   
 |  fcvt.w.s   |   R    |           |  fnmsub.s   |   R4   |           | 
 |  fcvt.wu.s  |   R    |           |  fnmadd.s   |   R4   |           | 
+
+### RV32A
+| Instruction | Format | Supported | Instruction | Format | Supported | 
+|:-----------:|:------:|:---------:|:-----------:|:------:|:---------:|
+|    lr.w     |   R    |  &check;  |   amoor.w   |   R    |  &check;  |
+|    sc.w     |   R    |  &check;  |  amomin.w   |   R    |  &check;  |
+|  amoswap.w  |   R    |  &check;  |  amomax.w   |   R    |  &check;  |
+|  amoadd.w   |   R    |  &check;  |  amominu.w  |   R    |  &check;  |
+|  amoxor.w   |   R    |  &check;  |  amomaxu.w  |   R    |  &check;  |
+|  amoand.w   |   R    |  &check;  |             |        |  &check;  |

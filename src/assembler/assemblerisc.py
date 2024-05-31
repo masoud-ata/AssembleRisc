@@ -29,7 +29,8 @@ class AssembleRisc:
             'compressed_store_sp_instruction': self._decode_compressed_store_sp_instruction,
             'compressed_j_instruction': self._decode_compressed_j_instruction,
             'compressed_j_r_instruction': self._decode_compressed_j_r_instruction,
-            'floating_point_r_instruction': self._decode_floating_point_r_instruction
+            'floating_point_r_instruction': self._decode_floating_point_r_instruction,
+            'atomic_instruction': self._decode_atomic_instruction
         }
 
     def _decode_r_instruction(self) -> str:
@@ -292,6 +293,17 @@ class AssembleRisc:
         rm_funct3_bits = instruction['rm_funct3']
         funct7_bits = FLOATING_POINT_R_FUNCT7[instruction['opcode']]
         return funct7_bits + rs2_bits + rs1_bits + rm_funct3_bits + rd_bits + opcode_bits
+
+    def _decode_atomic_instruction(self) -> str:
+        instruction = self.parse_info
+        opcode_bits = ATOMIC_OPCODE
+        rd_bits = get_register_index_binary(instruction['rd'])
+        rs1_bits = get_register_index_binary(instruction['rs1'])
+        rs2_bits = get_register_index_binary(instruction['rs2'])
+        funct3_bits = ATOMIC_FUNCT3
+        funct5_bits = ATOMIC_FUNCT5[instruction['opcode']]
+        aq_rl_bits = instruction['aq_rl']
+        return funct5_bits + aq_rl_bits + rs2_bits + rs1_bits + funct3_bits + rd_bits + opcode_bits
 
     def find_labels_pass(self) -> None:
         self.instruction_address = 0

@@ -611,6 +611,62 @@ def p_floating_point_instruction_freg_imm_lparen_xreg_rparen(p):
         }
 
 
+def p_instruction_xreg_lparen_xreg_rparen(p):
+    """expression : ID register COMMA LEFT_PAREN register RIGHT_PAREN NEWLINE"""
+    instruction: str = p[1]
+    aq_rl_bits = '00'
+    if instruction.endswith(".aqrl"):
+        instruction = instruction.replace(".aqrl", "")
+        aq_rl_bits = '11'
+    elif instruction.endswith(".aq"):
+        instruction = instruction.replace(".aq", "")
+        aq_rl_bits = '10'
+    elif instruction.endswith(".rl"):
+        instruction = instruction.replace(".rl", "")
+        aq_rl_bits = '01'
+
+    if instruction != INSTRUCTION_A_LR_W:
+        error_message = f'Error: incorrect or unrocognized instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+    p[0] = {
+        'type': 'atomic_instruction',
+        'opcode': p[1],
+        'rd': get_x_register_index(p[2]),
+        'rs2': '0',
+        'rs1': get_x_register_index(p[5]),
+        'aq_rl': aq_rl_bits,
+        'lineno': p.lineno(1)
+    }
+
+
+def p_instruction_xreg_xreg_lparen_xreg_rparen(p):
+    """expression : ID register COMMA register COMMA LEFT_PAREN register RIGHT_PAREN NEWLINE"""
+    instruction: str = p[1]
+    aq_rl_bits = '00'
+    if instruction.endswith(".aqrl"):
+        instruction = instruction.replace(".aqrl", "")
+        aq_rl_bits = '11'
+    elif instruction.endswith(".aq"):
+        instruction = instruction.replace(".aq", "")
+        aq_rl_bits = '10'
+    elif instruction.endswith(".rl"):
+        instruction = instruction.replace(".rl", "")
+        aq_rl_bits = '01'
+
+    if instruction not in ATOMIC_INSTRUCTIONS:
+        error_message = f'Error: incorrect or unrocognized instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+    p[0] = {
+        'type': 'atomic_instruction',
+        'opcode': instruction,
+        'rd': get_x_register_index(p[2]),
+        'rs2': get_x_register_index(p[4]),
+        'rs1': get_x_register_index(p[7]),
+        'aq_rl': aq_rl_bits,
+        'lineno': p.lineno(1)
+    }
+
+
 def p_xreg(p):
     """register : REGISTER"""
     reg_number = int(get_x_register_index(p[1]))
