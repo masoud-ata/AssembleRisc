@@ -275,7 +275,6 @@ def p_compressed_instruction_xreg_xreg(p):
     }
 
 
-
 def p_compressed_instruction_xreg_xreg_imm(p):
     """expression : COMPRESSED_ID register COMMA register COMMA IMMEDIATE NEWLINE"""
     if p[1] != INSTRUCTION_C_ADDI4SPN:
@@ -471,13 +470,10 @@ def p_compressed_instruction_xreg(p):
 
 def p_floating_point_instruction_freg_freg_freg(p):
     """expression : ID f_register COMMA f_register COMMA f_register NEWLINE"""
-    opcode = p[1]
-    if opcode in FLOATING_POINT_R_WITH_FUNCT3_DEST_X_INSTRUCTIONS:
-        error_message = f'Error: illegal operands at line {p.lineno(1)}'
-        raise Exception(error_message)
-    has_funct3 = opcode in FLOATING_POINT_R_WITH_FUNCT3_INSTRUCTIONS
-    rm_funct3 = FLOATING_POINT_R_FUNCT3[opcode] if has_funct3 else FLOATING_POINT_ROUNDING_MODES['dyn']
-
+    if p[1] in [INSTRUCTION_FADD_S, INSTRUCTION_FSUB_S, INSTRUCTION_FMUL_S, INSTRUCTION_FDIV_S]:
+        rm_funct3 = FLOATING_POINT_ROUNDING_MODES['dyn']
+    else:
+        rm_funct3 = FLOATING_POINT_R_FUNCT3[p[1]]
     p[0] = {
         'type': 'floating_point_r_instruction',
         'opcode': p[1],
@@ -485,6 +481,47 @@ def p_floating_point_instruction_freg_freg_freg(p):
         'rs1': get_f_register_index(p[4]),
         'rs2': get_f_register_index(p[6]),
         'rm_funct3': rm_funct3,
+        'lineno': p.lineno(1)
+    }
+
+
+def p_floating_point_instruction_freg_freg_freg_freg(p):
+    """expression : ID f_register COMMA f_register COMMA f_register COMMA f_register NEWLINE"""
+    if p[1] not in FLOATING_POINT_R4_INSTRUCTIONS:
+        error_message = f'Error: incorrect or unrocognized instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+
+    p[0] = {
+        'type': 'floating_point_r4_instruction',
+        'opcode': p[1],
+        'rd': get_f_register_index(p[2]),
+        'rs1': get_f_register_index(p[4]),
+        'rs2': get_f_register_index(p[6]),
+        'rs3': get_f_register_index(p[8]),
+        'rm_funct3': FLOATING_POINT_ROUNDING_MODES['dyn'],
+        'lineno': p.lineno(1)
+    }
+
+
+def p_floating_point_instruction_freg_freg_freg_freg_id(p):
+    """expression : ID f_register COMMA f_register COMMA f_register COMMA f_register COMMA ID NEWLINE"""
+    if p[1] not in FLOATING_POINT_R4_INSTRUCTIONS:
+        error_message = f'Error: incorrect or unrocognized instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+
+    rm = p[10]
+    if rm not in FLOATING_POINT_ROUNDING_MODES:
+        error_message = f'Error: illegal rounding mode at line {p.lineno(1)}'
+        raise Exception(error_message)
+
+    p[0] = {
+        'type': 'floating_point_r4_instruction',
+        'opcode': p[1],
+        'rd': get_f_register_index(p[2]),
+        'rs1': get_f_register_index(p[4]),
+        'rs2': get_f_register_index(p[6]),
+        'rs3': get_f_register_index(p[8]),
+        'rm_funct3': FLOATING_POINT_ROUNDING_MODES[p[10]],
         'lineno': p.lineno(1)
     }
 
@@ -553,34 +590,94 @@ def p_floating_point_instruction_freg_freg_id(p):
 
 def p_floating_point_instruction_xreg_freg(p):
     """expression : ID register COMMA f_register NEWLINE"""
-    if p[1] != INSTRUCTION_FMV_X_W:
+    if p[1] not in [INSTRUCTION_FMV_X_W, INSTRUCTION_FCVT_W_S, INSTRUCTION_FCVT_WU_S, INSTRUCTION_FCLASS_S]:
         error_message = f'Error: incorrect or unrocognized instruction at line {p.lineno(1)}'
         raise Exception(error_message)
+
+    rm_funct3 = '001' if p[1] == INSTRUCTION_FCLASS_S else '000'
+    rs2 = '0'
+    if p[1] in [INSTRUCTION_FCVT_W_S, INSTRUCTION_FCVT_WU_S]:
+        rm_funct3 = FLOATING_POINT_ROUNDING_MODES['dyn']
+        rs2 = '0' if p[1] == INSTRUCTION_FCVT_W_S else '1'
 
     p[0] = {
         'type': 'floating_point_r_instruction',
         'opcode': p[1],
         'rd': get_x_register_index(p[2]),
         'rs1': get_f_register_index(p[4]),
-        'rs2': '0',
-        'rm_funct3': '000',
+        'rs2': rs2,
+        'rm_funct3': rm_funct3,
+        'lineno': p.lineno(1)
+    }
+
+
+def p_floating_point_instruction_xreg_freg_id(p):
+    """expression : ID register COMMA f_register COMMA ID NEWLINE"""
+    if p[1] not in [INSTRUCTION_FCVT_W_S, INSTRUCTION_FCVT_WU_S]:
+        error_message = f'Error: incorrect or unrocognized instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+
+    if p[6] not in FLOATING_POINT_ROUNDING_MODES:
+        error_message = f'Error: illegal rounding mode at line {p.lineno(1)}'
+        raise Exception(error_message)
+
+    rm_funct3 = FLOATING_POINT_ROUNDING_MODES[p[6]]
+    rs2 = '0' if p[1] == INSTRUCTION_FCVT_W_S else '1'
+
+    p[0] = {
+        'type': 'floating_point_r_instruction',
+        'opcode': p[1],
+        'rd': get_x_register_index(p[2]),
+        'rs1': get_f_register_index(p[4]),
+        'rs2': rs2,
+        'rm_funct3': rm_funct3,
         'lineno': p.lineno(1)
     }
 
 
 def p_floating_point_instruction_freg_xreg(p):
     """expression : ID f_register COMMA register NEWLINE"""
-    if p[1] != INSTRUCTION_FMV_W_X:
+    if p[1] not in [INSTRUCTION_FMV_W_X, INSTRUCTION_FCVT_S_W, INSTRUCTION_FCVT_S_WU]:
         error_message = f'Error: incorrect or unrocognized instruction at line {p.lineno(1)}'
         raise Exception(error_message)
+
+    rm_funct3 = '000'
+    rs2 = '0'
+    if p[1] in [INSTRUCTION_FCVT_S_W, INSTRUCTION_FCVT_S_WU]:
+        rm_funct3 = FLOATING_POINT_ROUNDING_MODES['dyn']
+        rs2 = '0' if p[1] == INSTRUCTION_FCVT_S_W else '1'
 
     p[0] = {
         'type': 'floating_point_r_instruction',
         'opcode': p[1],
         'rd': get_f_register_index(p[2]),
         'rs1': get_x_register_index(p[4]),
-        'rs2': '0',
-        'rm_funct3': '000',
+        'rs2': rs2,
+        'rm_funct3': rm_funct3,
+        'lineno': p.lineno(1)
+    }
+
+
+def p_floating_point_instruction_freg_xreg_id(p):
+    """expression : ID f_register COMMA register COMMA ID NEWLINE"""
+    if p[1] not in [INSTRUCTION_FCVT_S_W, INSTRUCTION_FCVT_S_WU]:
+        error_message = f'Error: incorrect or unrocognized instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+
+    if p[6] not in FLOATING_POINT_ROUNDING_MODES:
+        error_message = f'Error: illegal rounding mode at line {p.lineno(1)}'
+        raise Exception(error_message)
+
+    rm_funct3 = FLOATING_POINT_ROUNDING_MODES[p[6]]
+    rs2 = '0' if p[1] == INSTRUCTION_FCVT_S_W else '1'
+
+    p[0] = {
+        'type': 'floating_point_r_instruction',
+        'opcode': p[1],
+        'rd': get_f_register_index(p[2]),
+        'rs1': get_x_register_index(p[4]),
+        'rs2': rs2,
+        'rm_funct3': rm_funct3,
         'lineno': p.lineno(1)
     }
 
@@ -616,13 +713,13 @@ def p_instruction_xreg_lparen_xreg_rparen(p):
     instruction: str = p[1]
     aq_rl_bits = '00'
     if instruction.endswith(".aqrl"):
-        instruction = instruction.replace(".aqrl", "")
+        instruction = instruction.replace(".aqrl", "", 1)
         aq_rl_bits = '11'
     elif instruction.endswith(".aq"):
-        instruction = instruction.replace(".aq", "")
+        instruction = instruction.replace(".aq", "", 1)
         aq_rl_bits = '10'
     elif instruction.endswith(".rl"):
-        instruction = instruction.replace(".rl", "")
+        instruction = instruction.replace(".rl", "", 1)
         aq_rl_bits = '01'
 
     if instruction != INSTRUCTION_A_LR_W:
@@ -644,13 +741,13 @@ def p_instruction_xreg_xreg_lparen_xreg_rparen(p):
     instruction: str = p[1]
     aq_rl_bits = '00'
     if instruction.endswith(".aqrl"):
-        instruction = instruction.replace(".aqrl", "")
+        instruction = instruction.replace(".aqrl", "", 1)
         aq_rl_bits = '11'
     elif instruction.endswith(".aq"):
-        instruction = instruction.replace(".aq", "")
+        instruction = instruction.replace(".aq", "", 1)
         aq_rl_bits = '10'
     elif instruction.endswith(".rl"):
-        instruction = instruction.replace(".rl", "")
+        instruction = instruction.replace(".rl", "", 1)
         aq_rl_bits = '01'
 
     if instruction not in ATOMIC_INSTRUCTIONS:

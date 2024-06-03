@@ -30,6 +30,7 @@ class AssembleRisc:
             'compressed_j_instruction': self._decode_compressed_j_instruction,
             'compressed_j_r_instruction': self._decode_compressed_j_r_instruction,
             'floating_point_r_instruction': self._decode_floating_point_r_instruction,
+            'floating_point_r4_instruction': self._decode_floating_point_r4_instruction,
             'atomic_instruction': self._decode_atomic_instruction
         }
 
@@ -293,6 +294,16 @@ class AssembleRisc:
         rm_funct3_bits = instruction['rm_funct3']
         funct7_bits = FLOATING_POINT_R_FUNCT7[instruction['opcode']]
         return funct7_bits + rs2_bits + rs1_bits + rm_funct3_bits + rd_bits + opcode_bits
+
+    def _decode_floating_point_r4_instruction(self) -> str:
+        instruction = self.parse_info
+        opcode_bits = FLOATING_POINT_R4_OPCODE[instruction['opcode']]
+        rd_bits = get_register_index_binary(instruction['rd'])
+        rs1_bits = get_register_index_binary(instruction['rs1'])
+        rs2_bits = get_register_index_binary(instruction['rs2'])
+        rs3_bits = get_register_index_binary(instruction['rs3'])
+        rm_funct3_bits = instruction['rm_funct3']
+        return rs3_bits + '00' + rs2_bits + rs1_bits + rm_funct3_bits + rd_bits + opcode_bits
 
     def _decode_atomic_instruction(self) -> str:
         instruction = self.parse_info

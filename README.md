@@ -1,5 +1,5 @@
 # AssembleRisc
-A Python assembler for RISC-V with support for RV32I, RV32C, RV32M, RV32F, and RV32A extensions
+A Python assembler for RISC-V with support for RV32IMFAC extensions
 
 
 ## Requirements
@@ -90,13 +90,13 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |   fdiv.s    |   R    |  &check;  |   fsqrt.s   |   R    |  &check;  | 
 |   fmv.x.w   |   R    |  &check;  |     flw     |   I    |  &check;  |   
 |   fmv.w.x   |   R    |  &check;  |     fsw     |   S    |  &check;  | 
-|   fsgnj.s   |   R    |           |  fcvt.s.w   |   R    |           |
-|  fsgnjn.s   |   R    |           |  fcvt.s.wu  |   R    |           |    
-|  fsgnjx.s   |   R    |           |  fclass.s   |   R    |           |    
-|   fmin.s    |   R    |           |   fmadd.s   |   R4   |           | 
-|   fmax.s    |   R    |           |   fmsub.s   |   R4   |           |   
-|  fcvt.w.s   |   R    |           |  fnmsub.s   |   R4   |           | 
-|  fcvt.wu.s  |   R    |           |  fnmadd.s   |   R4   |           | 
+|   fsgnj.s   |   R    |  &check;  |  fcvt.s.w   |   R    |  &check;  |
+|  fsgnjn.s   |   R    |  &check;  |  fcvt.s.wu  |   R    |  &check;  |    
+|  fsgnjx.s   |   R    |  &check;  |  fclass.s   |   R    |  &check;  |    
+|   fmin.s    |   R    |  &check;  |   fmadd.s   |   R4   |  &check;  | 
+|   fmax.s    |   R    |  &check;  |   fmsub.s   |   R4   |  &check;  |   
+|  fcvt.w.s   |   R    |  &check;  |  fnmsub.s   |   R4   |  &check;  | 
+|  fcvt.wu.s  |   R    |  &check;  |  fnmadd.s   |   R4   |  &check;  | 
 
 ### RV32A
 | Instruction | Format | Supported | Instruction | Format | Supported | 
@@ -106,4 +106,4 @@ The output files, both in textual binary and hexadeciaml, are placed in the `out
 |  amoswap.w  |   R    |  &check;  |  amomax.w   |   R    |  &check;  |
 |  amoadd.w   |   R    |  &check;  |  amominu.w  |   R    |  &check;  |
 |  amoxor.w   |   R    |  &check;  |  amomaxu.w  |   R    |  &check;  |
-|  amoand.w   |   R    |  &check;  |             |        |  &check;  |
+|  amoand.w   |   R    |  &check;  |             |        |           |
