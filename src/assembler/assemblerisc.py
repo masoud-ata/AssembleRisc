@@ -86,7 +86,12 @@ class AssembleRisc:
         instruction = self.parse_info
         opcode_bits = JAL_OPCODE
         rd_bits = get_register_index_binary(instruction['rd'])
-        imm_bits = get_immediate_binary_20_jal(instruction['imm'])
+        if 'imm' in instruction:
+            imm_bits = get_immediate_binary_20_jal(instruction['imm'])
+        else:
+            target_address = self.labels_table[instruction['label']]
+            imm_value = (target_address - self.instruction_address)
+            imm_bits = get_immediate_binary_20_jal(imm_value)
         return imm_bits + rd_bits + opcode_bits
 
     def _decode_jalr_instruction(self) -> str:

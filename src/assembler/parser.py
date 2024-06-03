@@ -229,6 +229,20 @@ def p_instruction_xreg_imm(p):
     }
 
 
+def p_instruction_xreg_id(p):
+    """expression : ID register COMMA ID NEWLINE"""
+    if p[1] != INSTRUCTION_JAL:
+        error_message = f'Error: illegal or incomplete instruction at line {p.lineno(1)}'
+        raise Exception(error_message)
+    p[0] = {
+        'type': 'jal_instruction',
+        'opcode': p[1],
+        'rd': get_x_register_index(p[2]),
+        'label': p[4],
+        'lineno': p.lineno(1)
+    }
+
+
 def p_instruction_xreg_xreg_id(p):
     """expression : ID register COMMA register COMMA ID NEWLINE"""
     p[0] = {
