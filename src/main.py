@@ -1,14 +1,28 @@
 import argparse
+import glob
 
 from assembler.assemblerisc import AssembleRisc
 
 
-def get_args() -> str:
+def run_regression() -> None:
+    assembler = AssembleRisc()
+    assembly_filenames = glob.glob("../regression/*.s")
+    for assembly_filename in assembly_filenames:
+        hex_code = _convert_to_hex(assembler.assemble(assembly_filename))
+        golden_filename = assembly_filename.replace(".s", ".txt")
+        with open(golden_filename, 'r') as golden_file:
+            data = golden_file.read()
+            if data != hex_code:
+                print(f'{assembly_filename} failed!')
+
+
+def get_args():
     argument_parser = argparse.ArgumentParser()
     argument_parser.add_argument("-i", "--input", help="Input assembly file name.")
+    argument_parser.add_argument("-r", "--regression", action='store_true')
+
     args = argument_parser.parse_args()
-    input_file = args.input if args.input else '../examples/tryouts.s'
-    return input_file
+    return args
 
 
 def write_output_file(filename, content):
@@ -38,7 +52,13 @@ def _dump_bytes(hex_code) -> str:
 
 def main():
     try:
-        input_filename = get_args()
+        args = get_args()
+
+        if args.regression:
+            run_regression()
+
+        input_filename = args.input if args.input else '../examples/tryouts.s'
+
         assembler = AssembleRisc()
         binary_code = assembler.assemble(input_filename)
 
